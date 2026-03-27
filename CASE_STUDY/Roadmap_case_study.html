@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Assistive Monitoring System — Dark Theme</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #000000;
+            color: #e5e9f0;
+            font-family: system-ui, -apple-system, 'Segoe UI', 'Inter', 'Roboto', sans-serif;
+            line-height: 1.5;
+            padding: 24px 20px;
+        }
+
+        /* main container */
+        .hld-wrap {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: transparent;
+            font-size: 14px;
+        }
+
+        /* ===== DARK THEME CUSTOM PROPERTIES ===== */
+        :root {
+            --gap: 16px;
+            --bg-elevated: #0a0a0c;
+            --bg-surface: #111114;
+            --border-dim: #2a2a2e;
+            --text-primary: #f0f3f8;
+            --text-secondary: #cbd5e6;
+            --text-tertiary: #8e9aaf;
+            --accent-teal: #5DCAA5;
+            --accent-blue: #85B7EB;
+            --accent-amber: #FAC775;
+            --accent-purple: #AFA9EC;
+            --accent-coral: #F0997B;
+        }
+
+        /* layer styling — dark + subtle colour glow */
+        .layer-label {
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--text-tertiary);
+            margin: 0 0 8px 4px;
+        }
+
+        .layer {
+            border-radius: 18px;
+            padding: 16px;
+            margin-bottom: 16px;
+            border: 0.5px solid rgba(255, 255, 255, 0.12);
+            background: rgba(8, 8, 12, 0.75);
+            backdrop-filter: blur(0px);
+            transition: all 0.1s ease;
+        }
+
+        /* subtle layer colour accents */
+        .layer.l1 { border-left: 3px solid var(--accent-teal); background: linear-gradient(120deg, rgba(93, 202, 165, 0.05), rgba(0, 0, 0, 0.2)); }
+        .layer.l2 { border-left: 3px solid var(--accent-blue); background: linear-gradient(120deg, rgba(133, 183, 235, 0.05), rgba(0, 0, 0, 0.2)); }
+        .layer.l3 { border-left: 3px solid var(--accent-amber); background: linear-gradient(120deg, rgba(250, 199, 117, 0.05), rgba(0, 0, 0, 0.2)); }
+        .layer.l4 { border-left: 3px solid var(--accent-purple); background: linear-gradient(120deg, rgba(175, 169, 236, 0.05), rgba(0, 0, 0, 0.2)); }
+        .layer.l5 { border-left: 3px solid var(--accent-coral); background: linear-gradient(120deg, rgba(240, 153, 123, 0.05), rgba(0, 0, 0, 0.2)); }
+
+        /* card row */
+        .row {
+            display: flex;
+            gap: var(--gap);
+            flex-wrap: wrap;
+        }
+
+        /* card base — dark glassmorph */
+        .card {
+            border-radius: 14px;
+            border: 0.5px solid var(--border-dim);
+            padding: 12px 14px;
+            cursor: pointer;
+            flex: 1;
+            min-width: 140px;
+            transition: border-color 0.2s, background 0.2s, transform 0.05s;
+            background: rgba(20, 22, 27, 0.7);
+            backdrop-filter: blur(2px);
+        }
+
+        .card:hover {
+            border-color: rgba(255, 255, 255, 0.4);
+            background: rgba(30, 33, 42, 0.85);
+        }
+
+        /* coloured card themes — subtle tint on dark */
+        .card.teal  { background: rgba(93, 202, 165, 0.12); border-left: 2px solid #5DCAA5; }
+        .card.blue  { background: rgba(133, 183, 235, 0.12); border-left: 2px solid #85B7EB; }
+        .card.amber { background: rgba(250, 199, 117, 0.12); border-left: 2px solid #FAC775; }
+        .card.purple{ background: rgba(175, 169, 236, 0.12); border-left: 2px solid #AFA9EC; }
+        .card.coral { background: rgba(240, 153, 123, 0.12); border-left: 2px solid #F0997B; }
+
+        .card-title {
+            font-weight: 600;
+            font-size: 13px;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .card-sub {
+            font-size: 11px;
+            color: var(--text-secondary);
+            line-height: 1.45;
+        }
+
+        /* badges */
+        .badge {
+            display: inline-block;
+            font-size: 10px;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 20px;
+            margin-top: 6px;
+            letter-spacing: 0.3px;
+        }
+
+        .badge.hw  { background: #1D6F4C; color: #e0f2e9; border: 0.5px solid #2E9F73; }
+        .badge.sw  { background: #1F6392; color: #e7f0ff; border: 0.5px solid #378ADD; }
+        .badge.sec { background: #A14527; color: #ffe6df; border: 0.5px solid #D85A30; }
+        .badge.cloud { background: #514C9E; color: #f0edff; border: 0.5px solid #7F77DD; }
+
+        /* arrow row */
+        .arrow-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin: 6px 0 10px;
+            color: #8e9aaf;
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .arrow-row span {
+            font-size: 18px;
+            filter: drop-shadow(0 0 2px rgba(0,0,0,0.5));
+        }
+
+        /* detail panel */
+        .detail-panel {
+            display: none;
+            margin-top: 14px;
+            padding: 14px 16px;
+            border-radius: 14px;
+            background: #0c0c10;
+            border: 0.5px solid #2a2a30;
+            font-size: 12px;
+            color: var(--text-secondary);
+            line-height: 1.65;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+        }
+
+        .detail-panel.open {
+            display: block;
+        }
+
+        .detail-panel strong {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .detail-panel code {
+            background: #1a1b22;
+            padding: 2px 6px;
+            border-radius: 8px;
+            font-family: 'JetBrains Mono', 'Fira Code', monospace;
+            font-size: 11px;
+            color: #f0c674;
+            border: 0.5px solid #333842;
+        }
+
+        /* section titles */
+        .section-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 20px 0 10px 0;
+            border-left: 3px solid var(--accent-amber);
+            padding-left: 10px;
+            letter-spacing: -0.2px;
+        }
+
+        /* tables */
+        .hw-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 11px;
+            margin-top: 8px;
+            background: rgba(12, 12, 18, 0.6);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .hw-table th {
+            color: var(--text-tertiary);
+            font-weight: 600;
+            text-align: left;
+            padding: 8px 10px;
+            border-bottom: 0.5px solid #2c2e36;
+            background: #08080c;
+        }
+
+        .hw-table td {
+            padding: 8px 10px;
+            border-bottom: 0.5px solid #26262e;
+            color: var(--text-secondary);
+            vertical-align: top;
+        }
+
+        .hw-table td:first-child {
+            color: var(--text-primary);
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        /* module grid */
+        .mod-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 12px;
+            margin-top: 10px;
+        }
+
+        .mod-item {
+            background: #101015;
+            border: 0.5px solid #2a2c34;
+            border-radius: 14px;
+            padding: 12px 14px;
+            font-size: 11px;
+            transition: all 0.1s;
+        }
+
+        .mod-name {
+            font-weight: 700;
+            color: #ccdeff;
+            font-size: 12px;
+            margin-bottom: 5px;
+            letter-spacing: -0.2px;
+        }
+
+        .mod-desc {
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        /* tabs */
+        .tab-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 24px;
+            border-bottom: 0.5px solid #2a2a30;
+            padding-bottom: 6px;
+        }
+
+        .tab {
+            padding: 6px 18px;
+            border-radius: 40px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            color: #a6b0cc;
+            transition: all 0.2s ease;
+            backdrop-filter: blur(2px);
+        }
+
+        .tab:hover {
+            color: white;
+            background: rgba(255,255,255,0.08);
+        }
+
+        .tab.active {
+            background: #ffffff;
+            color: #000000;
+            border: none;
+            box-shadow: 0 0 6px rgba(255,255,255,0.2);
+        }
+
+        .tab-panel {
+            display: none;
+        }
+
+        .tab-panel.active {
+            display: block;
+        }
+
+        /* additional tweaks */
+        .badge, .card, .layer {
+            transition: all 0.2s;
+        }
+
+        .hw-table tr:hover td {
+            background: rgba(90, 110, 150, 0.08);
+        }
+
+        .mod-item:hover {
+            border-color: #4e5468;
+            background: #15171f;
+        }
+
+        .card:active {
+            transform: scale(0.99);
+        }
+
+        /* responsiveness */
+        @media (max-width: 680px) {
+            body {
+                padding: 16px 12px;
+            }
+            .row {
+                gap: 12px;
+            }
+            .card {
+                min-width: 100%;
+            }
+            .mod-grid {
+                grid-template-columns: 1fr;
+            }
+            .hw-table td:first-child {
+                white-space: normal;
+            }
+        }
+
+        /* cost summary block */
+        .budget-note {
+            font-size: 12px;
+            background: #0a0a10;
+            padding: 10px 14px;
+            border-radius: 14px;
+            margin-top: 10px;
+            border: 0.5px solid #2c2e3a;
+        }
+
+        a, a:visited {
+            color: #9fc9ff;
+        }
+
+        code {
+            background: #1e1e28;
+            padding: 2px 5px;
+            border-radius: 6px;
+            font-size: 11px;
+        }
+    </style>
+</head>
+<body>
+<div class="hld-wrap">
+
+    <div class="tab-row">
+        <button class="tab active" onclick="showTab('arch')">🏛️ Architecture</button>
+        <button class="tab" onclick="showTab('hw')">🔧 Hardware</button>
+        <button class="tab" onclick="showTab('sw')">🧩 Software modules</button>
+    </div>
+
+    <!-- ARCHITECTURE TAB -->
+    <div id="tab-arch" class="tab-panel active">
+
+        <div class="layer-label">📡 Layer 1 — Sensor layer</div>
+        <div class="layer l1">
+            <div class="row">
+                <div class="card teal" onclick="toggle('d-pir')">
+                    <div class="card-title">PIR motion sensor</div>
+                    <div class="card-sub">HC-SR501 · digital motion</div>
+                    <span class="badge hw">hardware</span>
+                </div>
+                <div class="card teal" onclick="toggle('d-btn')">
+                    <div class="card-title">Emergency button</div>
+                    <div class="card-sub">Push button module</div>
+                    <span class="badge hw">hardware</span>
+                </div>
+                <div class="card teal" onclick="toggle('d-dht')">
+                    <div class="card-title">Env. sensor</div>
+                    <div class="card-sub">DHT22 · temp/humidity</div>
+                    <span class="badge hw">hardware</span>
+                </div>
+                <div class="card teal" onclick="toggle('d-cam')">
+                    <div class="card-title">Camera module</div>
+                    <div class="card-sub">Pi Camera v2 · optional</div>
+                    <span class="badge hw">hardware</span>
+                </div>
+            </div>
+            <div id="d-pir" class="detail-panel"><strong>🔴 PIR sensor (HC-SR501)</strong> — detects infrared motion. Outputs digital HIGH when movement is sensed. Used to detect activity/inactivity windows. Connects to GPIO. Inactivity threshold logic (e.g., no motion for 10 min) triggers alert.</div>
+            <div id="d-btn" class="detail-panel"><strong>🆘 Emergency button</strong> — momentary push button wired between GPIO and GND. When pressed, Pi reads LOW → immediate cloud alert. Shows direct human-in-the-loop interaction, highly valued in academic demos.</div>
+            <div id="d-dht" class="detail-panel"><strong>🌡️ DHT22</strong> — reads temperature (±0.5°C) and humidity (±2%). Adds environmental safety: alerts if temperature drops below safe threshold. Single-wire protocol, Adafruit_DHT library.</div>
+            <div id="d-cam" class="detail-panel"><strong>📷 Pi Camera v2</strong> — optional but powerful. Motion-triggered JPEG capture and cloud upload. Use OpenCV for presence detection. Adds richer data pipeline for advanced reports.</div>
+        </div>
+
+        <div class="arrow-row"><span>▼</span> GPIO reads → Python sensor scripts <span>▼</span></div>
+
+        <div class="layer-label">⚙️ Layer 2 — Embedded processing layer</div>
+        <div class="layer l2">
+            <div class="row">
+                <div class="card blue" onclick="toggle('d-pi')">
+                    <div class="card-title">Raspberry Pi 4</div>
+                    <div class="card-sub">Linux + Python host</div>
+                    <span class="badge hw">hardware</span>
+                    <span class="badge sw">software</span>
+                </div>
+                <div class="card blue" onclick="toggle('d-logic')">
+                    <div class="card-title">Alert logic engine</div>
+                    <div class="card-sub">Inactivity, thresholds</div>
+                    <span class="badge sw">software</span>
+                </div>
+                <div class="card blue" onclick="toggle('d-payload')">
+                    <div class="card-title">Payload formatter</div>
+                    <div class="card-sub">JSON telemetry builder</div>
+                    <span class="badge sw">software</span>
+                </div>
+            </div>
+            <div id="d-pi" class="detail-panel"><strong>🍓 Raspberry Pi 4</strong> — runs Raspberry Pi OS Lite. Hosts Python scripts, connects to sensors via GPIO. Wi-Fi connectivity and Azure IoT SDK. 32GB microSD recommended.</div>
+            <div id="d-logic" class="detail-panel"><strong>🧠 Alert logic engine</strong> — Python module tracks last motion timestamp. Inactivity threshold (e.g., 10 min) triggers inactivity alert. Also handles button debounce and temperature range monitoring.</div>
+            <div id="d-payload" class="detail-panel"><strong>📦 Payload formatter</strong> — builds structured JSON messages. Example:<br><code>{"deviceId":"rpi-01","event":"inactivity","duration_min":12,"temp":21.5,"timestamp":"2025-04-10T09:12:00Z"}</code></div>
+        </div>
+
+        <div class="arrow-row"><span>▼</span> MQTT over TLS — encrypted telemetry <span>▼</span></div>
+
+        <div class="layer-label">🔒 Layer 3 — Secure communication layer</div>
+        <div class="layer l3">
+            <div class="row">
+                <div class="card amber" onclick="toggle('d-tls')">
+                    <div class="card-title">MQTT over TLS</div>
+                    <div class="card-sub">Encrypted transport</div>
+                    <span class="badge sec">security</span>
+                    <span class="badge sw">software</span>
+                </div>
+                <div class="card amber" onclick="toggle('d-auth')">
+                    <div class="card-title">Device authentication</div>
+                    <div class="card-sub">Azure identity + SAS key</div>
+                    <span class="badge sec">security</span>
+                    <span class="badge cloud">cloud</span>
+                </div>
+                <div class="card amber" onclick="toggle('d-attack')">
+                    <div class="card-title">Threat simulation</div>
+                    <div class="card-sub">Fake device rejection demo</div>
+                    <span class="badge sec">security</span>
+                </div>
+            </div>
+            <div id="d-tls" class="detail-panel"><strong>🔐 MQTT over TLS (port 8883)</strong> — Azure IoT SDK handles TLS automatically. For advanced cybersecurity, upgrade to X.509 certificates instead of SAS keys.</div>
+            <div id="d-auth" class="detail-panel"><strong>🆔 Device authentication</strong> — each Pi is registered in Azure IoT Hub with unique device ID. SAS token per session ensures only registered devices publish telemetry — Zero Trust principle.</div>
+            <div id="d-attack" class="detail-panel"><strong>⚠️ Threat simulation</strong> — script that tries to connect with invalid device key. Azure rejects with 401. Log failed attempts and visualize on dashboard — powerful cybersecurity demo.</div>
+        </div>
+
+        <div class="arrow-row"><span>▼</span> Authenticated messages → Azure IoT Hub <span>▼</span></div>
+
+        <div class="layer-label">☁️ Layer 4 — Cloud layer (Azure)</div>
+        <div class="layer l4">
+            <div class="row">
+                <div class="card purple" onclick="toggle('d-hub')">
+                    <div class="card-title">Azure IoT Hub</div>
+                    <div class="card-sub">Device gateway + router</div>
+                    <span class="badge cloud">cloud</span>
+                    <span class="badge sec">security</span>
+                </div>
+                <div class="card purple" onclick="toggle('d-storage')">
+                    <div class="card-title">Azure Storage</div>
+                    <div class="card-sub">Table / Blob telemetry logs</div>
+                    <span class="badge cloud">cloud</span>
+                </div>
+                <div class="card purple" onclick="toggle('d-alert')">
+                    <div class="card-title">Alert system</div>
+                    <div class="card-sub">Logic Apps / email webhook</div>
+                    <span class="badge cloud">cloud</span>
+                </div>
+            </div>
+            <div id="d-hub" class="detail-panel"><strong>🌐 Azure IoT Hub (F1 free tier)</strong> — receives up to 8,000 messages/day. Authenticates identities, routes messages downstream. Built-in endpoint for basic version.</div>
+            <div id="d-storage" class="detail-panel"><strong>🗄️ Azure Table Storage</strong> — cheap and simple. Each telemetry message becomes a row (partition = deviceId, rowKey = timestamp). Blob storage for camera images if added.</div>
+            <div id="d-alert" class="detail-panel"><strong>⚡ Azure Logic Apps</strong> — no-code workflow that triggers on alert events (inactivity, button, temp). Sends email / Teams message. Fast setup for academic demos.</div>
+        </div>
+
+        <div class="arrow-row"><span>▼</span> REST API pull → dashboard <span>▼</span></div>
+
+        <div class="layer-label">📊 Layer 5 — Application layer</div>
+        <div class="layer l5">
+            <div class="row">
+                <div class="card coral" onclick="toggle('d-dash')">
+                    <div class="card-title">Streamlit dashboard</div>
+                    <div class="card-sub">Real-time caregiver view</div>
+                    <span class="badge sw">software</span>
+                </div>
+                <div class="card coral" onclick="toggle('d-rbac')">
+                    <div class="card-title">Access control</div>
+                    <div class="card-sub">Login-gated dashboard</div>
+                    <span class="badge sec">security</span>
+                </div>
+                <div class="card coral" onclick="toggle('d-notif')">
+                    <div class="card-title">Notifications</div>
+                    <div class="card-sub">Email / Teams alerts</div>
+                    <span class="badge cloud">cloud</span>
+                </div>
+            </div>
+            <div id="d-dash" class="detail-panel"><strong>📈 Streamlit dashboard</strong> — Python-native, pulls from Azure Table Storage every few seconds. Shows sensor status, activity timeline, alert log, threat log. Deploy locally or on Streamlit Cloud.</div>
+            <div id="d-rbac" class="detail-panel"><strong>🔑 Access control</strong> — minimal: st.secrets + password gate. Discuss RBAC conceptually (caregiver vs admin). Optionally use Azure AD B2C for token-based login.</div>
+            <div id="d-notif" class="detail-panel"><strong>📧 Notifications</strong> — caregiver receives email for: inactivity threshold, emergency button press, temperature out of range. Closes the assistive monitoring loop.</div>
+        </div>
+    </div>
+
+    <!-- HARDWARE TAB -->
+    <div id="tab-hw" class="tab-panel">
+        <div class="section-title">🧰 Required hardware</div>
+        <table class="hw-table">
+            <thead><tr><th>Component</th><th>Model</th><th>Purpose</th><th>Est. cost</th></tr></thead>
+            <tbody>
+                <tr><td>Main controller</td><td>Raspberry Pi 4 (2GB+)</td><td>Linux, Python, Azure SDK, Wi‑Fi</td><td>€55–70</td></tr>
+                <tr><td>MicroSD card</td><td>32GB Class 10</td><td>OS + code storage</td><td>€8–12</td></tr>
+                <tr><td>Power supply</td><td>USB-C 5V/3A</td><td>Pi power</td><td>€10–12</td></tr>
+                <tr><td>Breadboard</td><td>Full size 830-point</td><td>Prototyping</td><td>€5–8</td></tr>
+                <tr><td>Jumper wires</td><td>M-F + M-M pack</td><td>GPIO connections</td><td>€5–7</td></tr>
+                <tr><td>PIR sensor</td><td>HC-SR501</td><td>Motion detection</td><td>€3–5</td></tr>
+                <tr><td>Push button</td><td>Momentary tactile</td><td>Emergency alert trigger</td><td>€1–2</td></tr>
+                <tr><td>10kΩ resistor</td><td>Standard</td><td>Button pull-down</td><td>&lt;€1</td></tr>
+            </tbody>
+        </table>
+
+        <div class="section-title">✨ Recommended additions</div>
+        <table class="hw-table">
+            <thead><tr><th>Component</th><th>Model</th><th>Purpose</th><th>Est. cost</th></tr></thead>
+            <tbody>
+                <tr><td>Env. sensor</td><td>DHT22</td><td>Temperature + humidity monitoring</td><td>€4–6</td></tr>
+                <tr><td>Ultrasonic sensor</td><td>HC-SR04</td><td>Proximity / bed-exit detection</td><td>€3–5</td></tr>
+                <tr><td>Camera module</td><td>Pi Camera Module v2</td><td>Image capture, presence verify</td><td>€25–30</td></tr>
+                <tr><td>LED indicators</td><td>Red + green LEDs</td><td>Local status feedback for demo</td><td>€1–2</td></tr>
+            </tbody>
+        </table>
+
+        <div class="section-title">💰 Total estimated budget</div>
+        <div class="budget-note">
+            Minimum setup (required only): <strong style="color:#9fd3c7;">~€88–117</strong><br>
+            Full recommended setup (with camera): <strong style="color:#f0c674;">~€120–155</strong><br>
+            <span style="color:#8e9aaf;">💡 If you already own a Raspberry Pi, additional parts cost ~€20–30.</span>
+        </div>
+    </div>
+
+    <!-- SOFTWARE MODULES TAB -->
+    <div id="tab-sw" class="tab-panel">
+        <div class="section-title">🐍 Python modules — Raspberry Pi (edge)</div>
+        <div class="mod-grid">
+            <div class="mod-item"><div class="mod-name">sensor_reader.py</div><div class="mod-desc">GPIO polling loop for PIR, button, DHT22. Publishes events to internal queue. Runs as background thread.</div></div>
+            <div class="mod-item"><div class="mod-name">alert_engine.py</div><div class="mod-desc">Monitors inactivity timer, checks temp thresholds. Computes alert severity (info/warning/critical).</div></div>
+            <div class="mod-item"><div class="mod-name">payload_builder.py</div><div class="mod-desc">Builds JSON telemetry dict with deviceId, timestamp, event type, sensor values, alert flag.</div></div>
+            <div class="mod-item"><div class="mod-name">azure_client.py</div><div class="mod-desc">Wraps Azure IoT Hub SDK. Handles connection, reconnection, TLS message send using config.</div></div>
+            <div class="mod-item"><div class="mod-name">config.py</div><div class="mod-desc">Centralised settings: connection string, inactivity threshold, temp range, GPIO pin mapping. Never hardcode secrets.</div></div>
+            <div class="mod-item"><div class="mod-name">main.py</div><div class="mod-desc">Entry point. Starts sensor_reader thread, alert_engine loop, calls azure_client.send() on each event.</div></div>
+        </div>
+
+        <div class="section-title">☁️ Python modules — Cloud side / dashboard</div>
+        <div class="mod-grid">
+            <div class="mod-item"><div class="mod-name">storage_writer.py</div><div class="mod-desc">Azure Function (or script) that reads IoT Hub event stream and writes rows to Table Storage.</div></div>
+            <div class="mod-item"><div class="mod-name">alert_notifier.py</div><div class="mod-desc">Triggered on critical events. Sends email via SendGrid/SMTP, or POST to Teams webhook.</div></div>
+            <div class="mod-item"><div class="mod-name">dashboard.py (Streamlit)</div><div class="mod-desc">Queries Azure Table Storage. Shows live sensor status, activity timeline, alert log. Auto-refresh.</div></div>
+            <div class="mod-item"><div class="mod-name">threat_sim.py</div><div class="mod-desc">Simulates unauthorised device: attempts connection with invalid SAS key. Logs 401 rejection — cybersecurity demo.</div></div>
+        </div>
+
+        <div class="section-title">📚 Key Python libraries</div>
+        <table class="hw-table">
+            <thead><tr><th>Library</th><th>Purpose</th><th>Install</th></tr></thead>
+            <tbody>
+                <tr><td>azure-iot-device</td><td>IoT Hub SDK for Pi</td><td>pip install azure-iot-device</td></tr>
+                <tr><td>azure-data-tables</td><td>Table Storage read/write</td><td>pip install azure-data-tables</td></tr>
+                <tr><td>RPi.GPIO</td><td>GPIO control on Pi</td><td>pre-installed on Pi OS</td></tr>
+                <tr><td>adafruit-circuitpython-dht</td><td>DHT22 sensor reads</td><td>pip install adafruit-circuitpython-dht</td></tr>
+                <tr><td>streamlit</td><td>Dashboard UI</td><td>pip install streamlit</td></tr>
+                <tr><td>pandas</td><td>Data manipulation for charts</td><td>pip install pandas</td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    function toggle(id) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        const isOpen = el.classList.contains('open');
+        document.querySelectorAll('.detail-panel.open').forEach(p => p.classList.remove('open'));
+        if (!isOpen) el.classList.add('open');
+    }
+    function showTab(name) {
+        document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        const targetPanel = document.getElementById('tab-' + name);
+        if (targetPanel) targetPanel.classList.add('active');
+        event.target.classList.add('active');
+    }
+</script>
+</body>
+</html>
