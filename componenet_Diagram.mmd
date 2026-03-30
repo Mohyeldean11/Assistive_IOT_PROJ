@@ -1,0 +1,54 @@
+graph TD
+    %% Sensors
+    subgraph Input_Layer [Inputs]
+        PIR[PIR Sensor]
+        BTN[Button]
+        ENV[Env Sensor]
+    end
+
+    %% Sensors
+    subgraph SECURE [Secure Layer]
+        AUTH[device Authentication]
+        MQTT[MQTT OVER TLS]
+        THREAT[THREAT  SIMULATION]
+    end
+
+    %% Logic
+    RP[RASPBERRY PI]
+    EMG[Emergency]
+    SF[Sensor Fusion]
+    PP[Payload Parser]
+    SA[Sender Azure]
+    REQ[Requester]
+    RAW[RAW DATA]
+
+    %% Cloud
+    subgraph Azure_Cloud [Azure Infrastructure]
+        HUB[Azure IoT Hub]
+        DB[(DB)]
+    end
+
+    USER[User]
+
+    %% Connections
+    PIR --> RP
+    BTN --> RP
+    ENV --> RP
+
+    RP --> SF
+    RP --> RAW
+    RAW--> PP
+    
+    SF --> EMG
+    PP --> SA
+    EMG --> SA
+    
+    SA --> SECURE
+    SECURE --> HUB
+
+    HUB --> DB
+    HUB --> USER
+    USER --> HUB
+    HUB --> REQ
+    REQ --> SECURE
+    SECURE --> RP
