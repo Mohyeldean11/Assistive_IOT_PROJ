@@ -8,12 +8,12 @@ def EmergencyALgorithm(DataPayloadgroup:list )->bool:
     ReturnFlag = False
     movementflag = False
     for payloadent in DataPayloadgroup :
-        if not (18 <= payloadent['dht22']['temperature_celsius']<=24):
+        if not (18 <= payloadent['dht22']['Temp']<=24):
             ReturnFlag = True
-            print(f"good temp{payloadent['dht22']['temperature_celsius']}")
+            print(f"good temp{payloadent['dht22']['Temp']}")
             
         else:
-            print(f"bad temp{payloadent['dht22']['temperature_celsius']}")
+            print(f"bad temp{payloadent['dht22']['Temp']}")
 
         if not (40<= payloadent['dht22']['humidity_percent'] <= 60):
             ReturnFlag = True
@@ -29,3 +29,4 @@ def EmergencyALgorithm(DataPayloadgroup:list )->bool:
         print("no movement detected")
 
     return ReturnFlag
+

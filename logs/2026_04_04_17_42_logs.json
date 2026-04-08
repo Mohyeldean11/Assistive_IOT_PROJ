@@ -1,0 +1,44 @@
+[
+  {
+    "deviceId": "rpi-01",
+    "dht22": {
+      "gpio_pin": 4,
+      "timestamp": "Sat Apr  4 19:42:03 2026",
+      "Temp": 7,
+      "humidity_percent": 55
+    },
+    "PIR501": {
+      "value": 0,
+      "gpio_pin": 3,
+      "timestamp": "Sat Apr  4 19:42:03 2026"
+    }
+  },
+  {
+    "deviceId": "rpi-01",
+    "dht22": {
+      "gpio_pin": 4,
+      "timestamp": "Sat Apr  4 19:42:03 2026",
+      "Temp": 27,
+      "humidity_percent": 75
+    },
+    "PIR501": {
+      "value": 0,
+      "gpio_pin": 3,
+      "timestamp": "Sat Apr  4 19:42:03 2026"
+    }
+  },
+  {
+    "deviceId": "rpi-01",
+    "dht22": {
+      "gpio_pin": 4,
+      "timestamp": "Sat Apr  4 19:42:03 2026",
+      "Temp": 15,
+      "humidity_percent": 90
+    },
+    "PIR501": {
+      "value": 1,
+      "gpio_pin": 3,
+      "timestamp": "Sat Apr  4 19:42:03 2026"
+    }
+  }
+]
