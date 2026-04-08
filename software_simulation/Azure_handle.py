@@ -3,8 +3,8 @@ from azure.iot.device import IoTHubDeviceClient, Message
 from azure.data.tables import TableServiceClient
 import time, uuid,json
 
-CONNECTION_STRING = "HostName=elderlyMonitor-trial.azure-devices.net;DeviceId=rpi-01;SharedAccessKey=OOJ+dOV4DERHdfZFdedCeFLtJxB3R7yc4s1j3syBJQY="
-STORAGE_CONNECTION_STRING = "DefaultEndpointsProtocol=https;AccountName=assistivestorage01;AccountKey=mubMA9lZOYyaHPJIWsAUZsW+6LErrm1GByblaRxEOvVhcjifwdMYiHQ8bErOVsJJw4r57HWX/WTp+ASt/ZwtWA==;EndpointSuffix=core.windows.net"
+CONNECTION_STRING = "keys are removed for now"
+STORAGE_CONNECTION_STRING = "keys are removed for now"
 TABLE_NAME = "telemetry"
 
 class AzureAdmin:
@@ -44,13 +44,13 @@ class AzureAdmin_DATABASE(AzureAdmin):
     def save_to_table(self,payloadgp: list):
         for payload in payloadgp:          
             entity ={
-                "PartitionKey": payload.get("deviceId", "rpi-01"),
-                "RowKey": str(uuid.uuid4()),
-                "motion": str(payload.get("PIR501", {}).get("value", "")),
-                "temperature": str(payload.get("dht22", {}).get("Temp", "")),
-                "humidity": str(payload.get("dht22", {}).get("humidity_percent", "")),
-                "timestamp": str(payload.get("PIR501",{}).get("timestamp",""))
-            }
+            "PartitionKey": payload.get("deviceId", "rpi-01"),
+            "RowKey": str(uuid.uuid4()),
+            "motion": str(payload.get("PIR501", {}).get("value", "")),
+            "temperature": str(payload.get("dht22", {}).get("temperature_celsius", "")),
+            "humidity": str(payload.get("dht22", {}).get("humidity_percent", "")),
+            "timestamp": time.strftime("%Y-%m-%d__%H:%M", time.gmtime())
+        }
             self.table_client.create_entity(entity)
             print(f"Saved: {entity}")
 
