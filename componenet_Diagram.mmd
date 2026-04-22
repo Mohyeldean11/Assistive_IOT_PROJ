@@ -4,8 +4,13 @@ graph TD
         PIR[PIR Sensor]
         BTN[Button]
         ENV[Env Sensor]
+        CAM[Camera Module]
+        
     end
 
+
+    CV[CV PROCESING]
+    
     %% Sensors
     subgraph SECURE [Secure Layer]
         AUTH[device Authentication]
@@ -19,7 +24,6 @@ graph TD
     SF[Sensor Fusion]
     PP[Payload Parser]
     SA[Sender Azure]
-    REQ[Requester]
     RAW[RAW DATA]
 
     %% Cloud
@@ -34,7 +38,8 @@ graph TD
     PIR --> RP
     BTN --> RP
     ENV --> RP
-
+    CAM--> CV
+    CV--> RP
     RP --> SF
     RP --> RAW
     RAW--> PP
@@ -47,8 +52,7 @@ graph TD
     SECURE --> HUB
 
     HUB --> DB
-    HUB --> USER
+    DB --> USER
     USER --> HUB
-    HUB --> REQ
-    REQ --> SECURE
-    SECURE --> RP
+    EM[EMERGENCY CHANNELS]
+    Azure_Cloud -->EM
