@@ -9,8 +9,9 @@ graph TD
     end
 
 
-    CV[CV PROCESING]
-    
+    ML[MACHINE LEARNING PROCESING]
+    AI_1[AI POSE IDENTIFIER]
+    AI_2[AI HEALTH STATUS]
     %% Sensors
     subgraph SECURE [Secure Layer]
         AUTH[device Authentication]
@@ -24,7 +25,7 @@ graph TD
     SF[Sensor Fusion]
     PP[Payload Parser]
     SA[Sender Azure]
-    RAW[RAW DATA]
+    RAW[SENSORS DATA]
 
     %% Cloud
     subgraph Azure_Cloud [Azure Infrastructure]
@@ -38,13 +39,16 @@ graph TD
     PIR --> RP
     BTN --> RP
     ENV --> RP
-    CAM--> CV
-    CV--> RP
-    RP --> SF
+    CAM--> RP
+    RP --> ML
+    ML --> AI_1
+    AI_1 -->SF
     RP --> RAW
-    RAW--> PP
+    RAW--> SF
     
-    SF --> EMG
+    SF --> AI_2
+    AI_2 -->PP
+    AI_2 -->EMG
     PP --> SA
     EMG --> SA
     
