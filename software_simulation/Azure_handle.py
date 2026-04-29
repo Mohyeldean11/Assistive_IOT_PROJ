@@ -15,12 +15,16 @@ class AzureAdmin:
 class AzureAdmin_IOT(AzureAdmin):
     client  = None
     def __init__(self):
-        self.client = IoTHubDeviceClient.create_from_connection_string(connection_string=CONNECTION_STRING)
-        self.client.connect()
-        print('connected')
+        try:
+            self.client = IoTHubDeviceClient.create_from_connection_string(connection_string=CONNECTION_STRING)
+            self.client.connect()
+            print('connected')
+        except ValueError as e:
+            print(f'⚠️  Azure connection skipped: {e}')
+            self.client = None
 
     def Initiate_Azure_connection_send(self, messages=None) -> None:
-        if not messages:
+        if not messages or not self.client:
             return
 
         for message in messages:
@@ -38,10 +42,19 @@ class AzureAdmin_DATABASE(AzureAdmin):
     table_client =None
 
     def __init__(self):
-       self.table_service = TableServiceClient.from_connection_string(STORAGE_CONNECTION_STRING)
-       self.table_client = self.table_service.get_table_client(TABLE_NAME)
+        try:
+            self.table_service = TableServiceClient.from_connection_string(STORAGE_CONNECTION_STRING)
+            self.table_client = self.table_service.get_table_client(TABLE_NAME)
+        except Exception as e:
+            print(f'⚠️  Azure table storage skipped: {e}')
+            self.table_service = None
+            self.table_client = None
 
     def save_to_table(self,payloadgp: list):
+        if not self.table_client:
+            print("⚠️  Skipping database save (no connection)")
+            return
+            
         for payload in payloadgp:          
             entity ={
             "PartitionKey": payload.get("deviceId", "rpi-01"),
@@ -55,6 +68,10 @@ class AzureAdmin_DATABASE(AzureAdmin):
             print(f"Saved: {entity}")
 
     def view_data(self):
+        if not self.table_client:
+            print("No table client available")
+            return
+            
         entities = self.table_client.list_entities()
         for entity in entities:
             print(entity)

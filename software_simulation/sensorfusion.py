@@ -47,7 +47,7 @@ def  read_PIR501()->dict:
 def  read_dht22()->dict:
 
     dht22_raw['timestamp'] = time.asctime()
-    dht22_raw['Temp'] =  random.randrange(-3,28,2)
+    dht22_raw['temperature_celsius'] =  random.randrange(-3,28,2)
     dht22_raw['humidity_percent'] = random.randrange(20,100,5)
     return dht22_raw
 
