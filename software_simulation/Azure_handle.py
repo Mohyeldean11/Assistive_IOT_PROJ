@@ -62,6 +62,9 @@ class AzureAdmin_DATABASE(AzureAdmin):
             "motion": str(payload.get("PIR501", {}).get("value", "")),
             "temperature": str(payload.get("dht22", {}).get("temperature_celsius", "")),
             "humidity": str(payload.get("dht22", {}).get("humidity_percent", "")),
+            "pose": payload.get("pose", ""),
+            "health_status": payload.get("health_status", ""),
+            "emergency": str(payload.get("emergency", False)),
             "timestamp": time.strftime("%Y-%m-%d__%H:%M", time.gmtime())
         }
             self.table_client.create_entity(entity)
@@ -75,5 +78,12 @@ class AzureAdmin_DATABASE(AzureAdmin):
         entities = self.table_client.list_entities()
         for entity in entities:
             print(entity)
+
+
+def parse_payloads(payloads: list, health_status: str, emergency_flag: bool) -> list:
+    for payload in payloads:
+        payload['health_status'] = health_status
+        payload['emergency'] = emergency_flag
+    return payloads
 
 

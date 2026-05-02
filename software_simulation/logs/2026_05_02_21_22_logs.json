@@ -1,0 +1,53 @@
+[
+  {
+    "deviceId": "rpi-01",
+    "dht22": {
+      "gpio_pin": 4,
+      "timestamp": "Sat May  2 23:22:18 2026",
+      "temperature_celsius": 5,
+      "humidity_percent": 50
+    },
+    "PIR501": {
+      "value": 0,
+      "gpio_pin": 3,
+      "timestamp": "Sat May  2 23:22:18 2026"
+    },
+    "pose": "To determine whether this person is sitting normally or standing normally or falling down on the floor, I'll analyze the provided pose data.\n\nUpon examining the data, I notice that:\n\n- The presence values for many body parts are 0.0 (indicating a lack of normal presence), which suggests that there might be some issues with balance or posture.\n- Some body parts have significant deviations in their z-coordinates, such as the LEFT_ELBOW and RIGHT_ELBOW, indicating potential issues with arm positioning or joint alignment.\n\nConsidering these observations, I would lean towards the possibility of the person being \"LAYING ON THE FLOOR\" rather than sitting normally or standing normally. The data suggests that there might be a loss of balance or an unstable posture, which could lead to falling down on the floor.\n\nBased on this analysis, my recommendation would be:\n\nPose: LAYING ON THE FLOOR",
+    "health_status": "Based on the sensor data provided, I would classify the person's pose as \"NOT NORMAL\" for all three instances.\n\nThe analysis conducted by the AI suggests that:\n\n* There are significant deviations in the presence values of many body parts (e.g., LEFT_ELBOW and RIGHT_ELBOW), indicating potential issues with arm positioning or joint alignment.\n* The z-coordinates of some body parts have significant deviations, suggesting an unstable posture or loss of balance.\n* The AI's recommendation for all three instances is to pose the person as \"LAYING ON THE FLOOR\", which indicates that the person is not in a stable, upright position.\n\nTherefore, I would classify the person's pose as \"NOT NORMAL\" for each instance.",
+    "emergency": true
+  },
+  {
+    "deviceId": "rpi-01",
+    "dht22": {
+      "gpio_pin": 4,
+      "timestamp": "Sat May  2 23:22:18 2026",
+      "temperature_celsius": 27,
+      "humidity_percent": 45
+    },
+    "PIR501": {
+      "value": 1,
+      "gpio_pin": 3,
+      "timestamp": "Sat May  2 23:22:18 2026"
+    },
+    "pose": "To determine whether this person is sitting normally or standing normally or falling down on the floor, I'll analyze the provided pose data.\n\nUpon examining the data, I notice that:\n\n- The presence values for many body parts are 0.0 (indicating a lack of normal presence), which suggests that there might be some issues with balance or posture.\n- Some body parts have significant deviations in their z-coordinates, such as the LEFT_ELBOW and RIGHT_ELBOW, indicating potential issues with arm positioning or joint alignment.\n\nConsidering these observations, I would lean towards the possibility of the person being \"LAYING ON THE FLOOR\" rather than sitting normally or standing normally. The data suggests that there might be a loss of balance or an unstable posture, which could lead to falling down on the floor.\n\nBased on this analysis, my recommendation would be:\n\nPose: LAYING ON THE FLOOR",
+    "health_status": "Based on the sensor data provided, I would classify the person's pose as \"NOT NORMAL\" for all three instances.\n\nThe analysis conducted by the AI suggests that:\n\n* There are significant deviations in the presence values of many body parts (e.g., LEFT_ELBOW and RIGHT_ELBOW), indicating potential issues with arm positioning or joint alignment.\n* The z-coordinates of some body parts have significant deviations, suggesting an unstable posture or loss of balance.\n* The AI's recommendation for all three instances is to pose the person as \"LAYING ON THE FLOOR\", which indicates that the person is not in a stable, upright position.\n\nTherefore, I would classify the person's pose as \"NOT NORMAL\" for each instance.",
+    "emergency": true
+  },
+  {
+    "deviceId": "rpi-01",
+    "dht22": {
+      "gpio_pin": 4,
+      "timestamp": "Sat May  2 23:22:18 2026",
+      "temperature_celsius": 7,
+      "humidity_percent": 95
+    },
+    "PIR501": {
+      "value": 1,
+      "gpio_pin": 3,
+      "timestamp": "Sat May  2 23:22:18 2026"
+    },
+    "pose": "To determine whether this person is sitting normally or standing normally or falling down on the floor, I'll analyze the provided pose data.\n\nUpon examining the data, I notice that:\n\n- The presence values for many body parts are 0.0 (indicating a lack of normal presence), which suggests that there might be some issues with balance or posture.\n- Some body parts have significant deviations in their z-coordinates, such as the LEFT_ELBOW and RIGHT_ELBOW, indicating potential issues with arm positioning or joint alignment.\n\nConsidering these observations, I would lean towards the possibility of the person being \"LAYING ON THE FLOOR\" rather than sitting normally or standing normally. The data suggests that there might be a loss of balance or an unstable posture, which could lead to falling down on the floor.\n\nBased on this analysis, my recommendation would be:\n\nPose: LAYING ON THE FLOOR",
+    "health_status": "Based on the sensor data provided, I would classify the person's pose as \"NOT NORMAL\" for all three instances.\n\nThe analysis conducted by the AI suggests that:\n\n* There are significant deviations in the presence values of many body parts (e.g., LEFT_ELBOW and RIGHT_ELBOW), indicating potential issues with arm positioning or joint alignment.\n* The z-coordinates of some body parts have significant deviations, suggesting an unstable posture or loss of balance.\n* The AI's recommendation for all three instances is to pose the person as \"LAYING ON THE FLOOR\", which indicates that the person is not in a stable, upright position.\n\nTherefore, I would classify the person's pose as \"NOT NORMAL\" for each instance.",
+    "emergency": true
+  }
+]

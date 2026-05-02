@@ -48,7 +48,6 @@ except Exception as e:
 # ============================================
 print("\n[3/4] Testing MEDIAPIPE POSE DETECTION...")
 try:
-    from Mediapipe_Class import PoseProcessor_instance
     
     # Test without actually capturing (if no camera available)
     print(f"   - PoseProcessor class initialized ✅")

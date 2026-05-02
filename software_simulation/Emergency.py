@@ -8,25 +8,36 @@ def EmergencyALgorithm(DataPayloadgroup:list )->bool:
     ReturnFlag = False
     movementflag = False
     for payloadent in DataPayloadgroup :
-        if not (18 <= payloadent['dht22']['temperature_celsius']<=24):
+        # Check temperature
+        if not (18 <= payloadent['dht22']['temperature_celsius'] <= 24):
             ReturnFlag = True
-            print(f"good temp{payloadent['dht22']['temperature_celsius']}")
-            
+            print(f"bad temp: {payloadent['dht22']['temperature_celsius']}")
         else:
-            print(f"bad temp{payloadent['dht22']['temperature_celsius']}")
+            print(f"good temp: {payloadent['dht22']['temperature_celsius']}")
 
-        if not (40<= payloadent['dht22']['humidity_percent'] <= 60):
+        # Check humidity
+        if not (40 <= payloadent['dht22']['humidity_percent'] <= 60):
             ReturnFlag = True
-            print(f"good humidity{payloadent['dht22']['humidity_percent']}")
-        else :
-            print(f"bad humidity{payloadent['dht22']['humidity_percent']}")
+            print(f"bad humidity: {payloadent['dht22']['humidity_percent']}")
+        else:
+            print(f"good humidity: {payloadent['dht22']['humidity_percent']}")
+
+        # Check motion
         if payloadent['PIR501']['value'] == 1 : 
-            movementflag =True
+            movementflag = True
             print("movement detected")
+
+        # Check pose for fall detection
+        pose = payloadent.get('pose', '')
+        if pose == "LAYING ON THE FLOOR" and not movementflag:
+            ReturnFlag = True
+            print("fall detected: laying on floor with no motion")
     
-    if(ReturnFlag != True  and movementflag == False): 
+    if not ReturnFlag and not movementflag: 
         ReturnFlag = True
         print("no movement detected")
+
+    return ReturnFlag
 
     return ReturnFlag
 

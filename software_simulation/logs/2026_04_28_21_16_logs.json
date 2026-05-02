@@ -1,0 +1,296 @@
+[
+  {
+    "deviceId": "rpi-01",
+    "dht22": {
+      "gpio_pin": 4,
+      "timestamp": "Tue Apr 28 23:16:51 2026",
+      "temperature_celsius": 21,
+      "humidity_percent": 35
+    },
+    "PIR501": {
+      "value": 0,
+      "gpio_pin": 3,
+      "timestamp": "Tue Apr 28 23:16:51 2026"
+    }
+  },
+  {
+    "deviceId": "rpi-01",
+    "dht22": {
+      "gpio_pin": 4,
+      "timestamp": "Tue Apr 28 23:16:51 2026",
+      "temperature_celsius": 21,
+      "humidity_percent": 45
+    },
+    "PIR501": {
+      "value": 1,
+      "gpio_pin": 3,
+      "timestamp": "Tue Apr 28 23:16:51 2026"
+    }
+  },
+  {
+    "deviceId": "rpi-01",
+    "dht22": {
+      "gpio_pin": 4,
+      "timestamp": "Tue Apr 28 23:16:51 2026",
+      "temperature_celsius": 23,
+      "humidity_percent": 20
+    },
+    "PIR501": {
+      "value": 0,
+      "gpio_pin": 3,
+      "timestamp": "Tue Apr 28 23:16:51 2026"
+    }
+  },
+  {
+    "deviceId": "rpi-01",
+    "dht22": {
+      "gpio_pin": 4,
+      "timestamp": "Tue Apr 28 23:16:51 2026",
+      "temperature_celsius": 13,
+      "humidity_percent": 45
+    },
+    "PIR501": {
+      "value": 1,
+      "gpio_pin": 3,
+      "timestamp": "Tue Apr 28 23:16:51 2026"
+    }
+  },
+  {
+    "deviceId": "rpi-01",
+    "dht22": {
+      "gpio_pin": 4,
+      "timestamp": "Tue Apr 28 23:16:51 2026",
+      "temperature_celsius": 27,
+      "humidity_percent": 60
+    },
+    "PIR501": {
+      "value": 1,
+      "gpio_pin": 3,
+      "timestamp": "Tue Apr 28 23:16:51 2026"
+    }
+  },
+  {
+    "deviceId": "rpi-01",
+    "dht22": {
+      "gpio_pin": 4,
+      "timestamp": "Tue Apr 28 23:16:51 2026",
+      "temperature_celsius": 1,
+      "humidity_percent": 55
+    },
+    "PIR501": {
+      "value": 0,
+      "gpio_pin": 3,
+      "timestamp": "Tue Apr 28 23:16:51 2026"
+    }
+  },
+  {
+    "deviceId": "rpi-01",
+    "dht22": {
+      "gpio_pin": 4,
+      "timestamp": "Tue Apr 28 23:16:52 2026",
+      "temperature_celsius": 1,
+      "humidity_percent": 30
+    },
+    "PIR501": {
+      "value": 1,
+      "gpio_pin": 3,
+      "timestamp": "Tue Apr 28 23:16:52 2026"
+    }
+  },
+  {
+    "deviceId": "rpi-01",
+    "dht22": {
+      "gpio_pin": 4,
+      "timestamp": "Tue Apr 28 23:16:52 2026",
+      "temperature_celsius": 25,
+      "humidity_percent": 85
+    },
+    "PIR501": {
+      "value": 1,
+      "gpio_pin": 3,
+      "timestamp": "Tue Apr 28 23:16:52 2026"
+    }
+  },
+  {
+    "deviceId": "rpi-01",
+    "dht22": {
+      "gpio_pin": 4,
+      "timestamp": "Tue Apr 28 23:16:52 2026",
+      "temperature_celsius": 5,
+      "humidity_percent": 75
+    },
+    "PIR501": {
+      "value": 0,
+      "gpio_pin": 3,
+      "timestamp": "Tue Apr 28 23:16:52 2026"
+    }
+  },
+  {
+    "deviceId": "rpi-01",
+    "dht22": {
+      "gpio_pin": 4,
+      "timestamp": "Tue Apr 28 23:16:51 2026",
+      "temperature_celsius": 21,
+      "humidity_percent": 35
+    },
+    "PIR501": {
+      "value": 0,
+      "gpio_pin": 3,
+      "timestamp": "Tue Apr 28 23:16:51 2026"
+    }
+  },
+  {
+    "deviceId": "rpi-01",
+    "dht22": {
+      "gpio_pin": 4,
+      "timestamp": "Tue Apr 28 23:16:51 2026",
+      "temperature_celsius": 21,
+      "humidity_percent": 45
+    },
+    "PIR501": {
+      "value": 1,
+      "gpio_pin": 3,
+      "timestamp": "Tue Apr 28 23:16:51 2026"
+    }
+  },
+  {
+    "deviceId": "rpi-01",
+    "dht22": {
+      "gpio_pin": 4,
+      "timestamp": "Tue Apr 28 23:16:51 2026",
+      "temperature_celsius": 23,
+      "humidity_percent": 20
+    },
+    "PIR501": {
+      "value": 0,
+      "gpio_pin": 3,
+      "timestamp": "Tue Apr 28 23:16:51 2026"
+    }
+  },
+  {
+    "deviceId": "rpi-01",
+    "dht22": {
+      "gpio_pin": 4,
+      "timestamp": "Tue Apr 28 23:16:51 2026",
+      "temperature_celsius": 13,
+      "humidity_percent": 45
+    },
+    "PIR501": {
+      "value": 1,
+      "gpio_pin": 3,
+      "timestamp": "Tue Apr 28 23:16:51 2026"
+    }
+  },
+  {
+    "deviceId": "rpi-01",
+    "dht22": {
+      "gpio_pin": 4,
+      "timestamp": "Tue Apr 28 23:16:51 2026",
+      "temperature_celsius": 27,
+      "humidity_percent": 60
+    },
+    "PIR501": {
+      "value": 1,
+      "gpio_pin": 3,
+      "timestamp": "Tue Apr 28 23:16:51 2026"
+    }
+  },
+  {
+    "deviceId": "rpi-01",
+    "dht22": {
+      "gpio_pin": 4,
+      "timestamp": "Tue Apr 28 23:16:51 2026",
+      "temperature_celsius": 1,
+      "humidity_percent": 55
+    },
+    "PIR501": {
+      "value": 0,
+      "gpio_pin": 3,
+      "timestamp": "Tue Apr 28 23:16:51 2026"
+    }
+  },
+  {
+    "deviceId": "rpi-01",
+    "dht22": {
+      "gpio_pin": 4,
+      "timestamp": "Tue Apr 28 23:16:52 2026",
+      "temperature_celsius": 1,
+      "humidity_percent": 30
+    },
+    "PIR501": {
+      "value": 1,
+      "gpio_pin": 3,
+      "timestamp": "Tue Apr 28 23:16:52 2026"
+    }
+  },
+  {
+    "deviceId": "rpi-01",
+    "dht22": {
+      "gpio_pin": 4,
+      "timestamp": "Tue Apr 28 23:16:52 2026",
+      "temperature_celsius": 25,
+      "humidity_percent": 85
+    },
+    "PIR501": {
+      "value": 1,
+      "gpio_pin": 3,
+      "timestamp": "Tue Apr 28 23:16:52 2026"
+    }
+  },
+  {
+    "deviceId": "rpi-01",
+    "dht22": {
+      "gpio_pin": 4,
+      "timestamp": "Tue Apr 28 23:16:52 2026",
+      "temperature_celsius": 5,
+      "humidity_percent": 75
+    },
+    "PIR501": {
+      "value": 0,
+      "gpio_pin": 3,
+      "timestamp": "Tue Apr 28 23:16:52 2026"
+    }
+  },
+  {
+    "deviceId": "rpi-01",
+    "dht22": {
+      "gpio_pin": 4,
+      "timestamp": "Tue Apr 28 23:16:52 2026",
+      "temperature_celsius": 5,
+      "humidity_percent": 45
+    },
+    "PIR501": {
+      "value": 0,
+      "gpio_pin": 3,
+      "timestamp": "Tue Apr 28 23:16:52 2026"
+    }
+  },
+  {
+    "deviceId": "rpi-01",
+    "dht22": {
+      "gpio_pin": 4,
+      "timestamp": "Tue Apr 28 23:16:52 2026",
+      "temperature_celsius": 3,
+      "humidity_percent": 80
+    },
+    "PIR501": {
+      "value": 1,
+      "gpio_pin": 3,
+      "timestamp": "Tue Apr 28 23:16:52 2026"
+    }
+  },
+  {
+    "deviceId": "rpi-01",
+    "dht22": {
+      "gpio_pin": 4,
+      "timestamp": "Tue Apr 28 23:16:53 2026",
+      "temperature_celsius": 3,
+      "humidity_percent": 35
+    },
+    "PIR501": {
+      "value": 0,
+      "gpio_pin": 3,
+      "timestamp": "Tue Apr 28 23:16:53 2026"
+    }
+  }
+]

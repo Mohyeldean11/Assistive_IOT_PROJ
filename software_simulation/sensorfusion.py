@@ -3,6 +3,7 @@ import random
 import copy
 
 PayloadGroup = []
+CurrentPAYLOAD = {}         
 
 # PIR Raw digital readings
 pir_output = {
@@ -37,7 +38,7 @@ def init_sensors()->bool:
 
 def  read_PIR501()->dict:
 
-    pir_output['timestamp'] = time.asctime()
+    pir_output['timestamp'] = time.asctime() # type: ignore
     pir_output['value'] =  random.randrange(0,2)
 
     return pir_output
@@ -46,7 +47,7 @@ def  read_PIR501()->dict:
 
 def  read_dht22()->dict:
 
-    dht22_raw['timestamp'] = time.asctime()
+    dht22_raw['timestamp'] = time.asctime() # type: ignore
     dht22_raw['temperature_celsius'] =  random.randrange(-3,28,2)
     dht22_raw['humidity_percent'] = random.randrange(20,100,5)
     return dht22_raw
@@ -56,7 +57,6 @@ def  read_dht22()->dict:
 
 def retreive_sensor_Data()->list:
     for x in range(0, 3, 1):
-        CurrentPAYLOAD = {}         
         print(f"Loop iteration {x}")
         CurrentPAYLOAD['deviceId'] = 'rpi-01'
         CurrentPAYLOAD['dht22'] = read_dht22()
@@ -66,4 +66,10 @@ def retreive_sensor_Data()->list:
         time.sleep(0.1)
     
     return PayloadGroup
+
+
+def fuse_data_with_pose(payloads: list, pose: str) -> list:
+    for payload in payloads:
+        payload['pose'] = pose
+    return payloads
 
