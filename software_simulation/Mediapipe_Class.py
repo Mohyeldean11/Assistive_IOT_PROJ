@@ -29,6 +29,8 @@ class PoseProcessor :
         poseVision_Running = mp.tasks.vision.RunningMode
         self.options = poselandmarker_options(base_options=baseoptions(model_asset_path = model_path),
                                 running_mode = poseVision_Running.IMAGE)
+        print("init")
+        
         
 
 
@@ -38,13 +40,16 @@ class PoseProcessor :
             retval,frame = capture_object.read()
             capture_object.release()
         frame_rgp = cv2.cvtColor(frame,cv2.COLOR_BGR2RGB)
+        print("captureframe")
         cv2.imwrite("pose_image.jpg",frame)
         return frame_rgp
     
-    def processframe(self,frame_rgp_target)->dict:
+    def processframe(self)->dict:
         with self.poselandmarker.create_from_options(self.options) as Landmarker:
+            frame_rgp_target = self.captureframe()
             mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=frame_rgp_target)
             results = Landmarker.detect(mp_image)
+        print("processframe")
         if results.pose_landmarks:
             print("Person detected")
             pose_data = {}
@@ -61,4 +66,25 @@ class PoseProcessor :
             pose_data = {}
         return pose_data
 
-PoseProcessor_instance = PoseProcessor()
+
+class frame_classifier : 
+    def __init__(self):
+        pose_obj = PoseProcessor(r".\..\Helper_Models\pose_landmarker_lite.task")
+        self.pose_body_parts = pose_obj.processframe()
+        
+
+    def get_face(self)-> list :
+    
+        for values in POSE_LANDMARK_NAMES:
+            print(f"body part {values}: {self.pose_body_parts[values]}")
+            print("\n")
+                
+
+
+# this_dict = PoseProcessor_instance.processframe()
+# for values in POSE_LANDMARK_NAMES:
+#     print(this_dict[values])
+#     print("\n")
+
+frame_classifier_inst = frame_classifier()
+frame_classifier_inst.get_face()
