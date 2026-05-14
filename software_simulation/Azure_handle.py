@@ -3,8 +3,8 @@ from azure.iot.device import IoTHubDeviceClient, Message
 from azure.data.tables import TableServiceClient
 import time, uuid,json
 
-CONNECTION_STRING = "HostName=elderlyMonitor.azure-devices.net;DeviceId=rpi-1;SharedAccessKey=1feurZAW6K65IczAhw4/ERu9H574YcYtjGXcITZqdCU="
-STORAGE_CONNECTION_STRING = "DefaultEndpointsProtocol=https;AccountName=assistivestorage01;AccountKey=mubMA9lZOYyaHPJIWsAUZsW+6LErrm1GByblaRxEOvVhcjifwdMYiHQ8bErOVsJJw4r57HWX/WTp+ASt/ZwtWA==;EndpointSuffix=core.windows.net"
+CONNECTION_STRING = "YOUR IOT ID"
+STORAGE_CONNECTION_STRING = "YOUR DB ID"
 TABLE_NAME = "telemetry"
 
 class AzureAdmin:
