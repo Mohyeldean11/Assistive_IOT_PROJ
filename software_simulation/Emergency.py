@@ -39,5 +39,4 @@ def EmergencyALgorithm(DataPayloadgroup:list )->bool:
 
     return ReturnFlag
 
-    return ReturnFlag
 

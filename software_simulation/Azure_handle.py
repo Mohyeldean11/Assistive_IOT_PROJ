@@ -4,7 +4,7 @@ from azure.data.tables import TableServiceClient
 import time, uuid,json
 
 CONNECTION_STRING = "keys are removed for now"
-STORAGE_CONNECTION_STRING = "keys are removed for now"
+STORAGE_CONNECTION_STRING = "DefaultEndpointsProtocol=https;AccountName=assistivestorage01;AccountKey=mubMA9lZOYyaHPJIWsAUZsW+6LErrm1GByblaRxEOvVhcjifwdMYiHQ8bErOVsJJw4r57HWX/WTp+ASt/ZwtWA==;EndpointSuffix=core.windows.net"
 TABLE_NAME = "telemetry"
 
 class AzureAdmin:
@@ -80,10 +80,10 @@ class AzureAdmin_DATABASE(AzureAdmin):
             print(entity)
 
 
-def parse_payloads(payloads: list, health_status: str, emergency_flag: bool) -> list:
-    for payload in payloads:
-        payload['health_status'] = health_status
-        payload['emergency'] = emergency_flag
-    return payloads
+def parse_payload(payload: dict, health_status: str, emergency_flag: bool, stroke_risk: dict) -> dict:
+    payload['health_status'] = health_status
+    payload['emergency'] = emergency_flag
+    payload['stroke_risk'] = stroke_risk
+    return payload
 
 

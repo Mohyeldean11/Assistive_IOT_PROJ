@@ -55,21 +55,19 @@ def  read_dht22()->dict:
 
 
 
-def retreive_sensor_Data()->list:
-    for x in range(0, 3, 1):
-        print(f"Loop iteration {x}")
-        CurrentPAYLOAD['deviceId'] = 'rpi-01'
-        CurrentPAYLOAD['dht22'] = read_dht22()
-        CurrentPAYLOAD['PIR501'] = read_PIR501()
-        PayloadGroup.append(copy.deepcopy(CurrentPAYLOAD))
-        print(f"Payload built: {CurrentPAYLOAD}")
-        time.sleep(0.1)
-    
-    return PayloadGroup
+def retreive_sensor_Data()->dict:
+    # for x in range(0, 3, 1):
+        # print(f"Loop iteration {x}")
+    CurrentPAYLOAD['deviceId'] = 'rpi-01'
+    CurrentPAYLOAD['dht22'] = read_dht22()
+    CurrentPAYLOAD['PIR501'] = read_PIR501()
+    # PayloadGroup.append(copy.deepcopy(CurrentPAYLOAD))
+    # print(f"Payload built: {CurrentPAYLOAD}")
+    # time.sleep(0.1)
+    return CurrentPAYLOAD
 
 
-def fuse_data_with_pose(payloads: list, pose: str) -> list:
-    for payload in payloads:
-        payload['pose'] = pose
-    return payloads
+def fuse_data_with_pose(payload: dict, pose: str) -> dict:
+    payload['pose'] = pose
+    return payload
 
