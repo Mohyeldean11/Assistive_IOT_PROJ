@@ -1,0 +1,73 @@
+graph TD
+    %% Inputs
+    subgraph Input_Layer [Inputs]
+        PIR[PIR Sensor]
+        BTN[Button]
+        ENV[Env Sensor]
+        CAM[Camera Module]
+    end
+
+    %% Processing
+    RP[RASPBERRY PI]
+    RAW[SENSORS DATA]
+    SF[Sensor Fusion]
+    EMG[Emergency Logic]
+    PP[Payload Parser]
+    SA[Azure Sender]
+
+    subgraph ML [Machine Learning / AI]
+        AI_LAYER[AI_LAYER]
+        FC[frame_classifier]
+        PPose[PoseProcessor]
+        SD[StrokeDetector]
+        PT[pose_training]
+        AI_STATUS[AI Health Status]
+    end
+
+    %% Secure Layer
+    subgraph SECURE [Secure Layer]
+        AUTH[Device Authentication]
+        MQTT[MQTT over TLS]
+        THREAT[Threat Simulation]
+    end
+
+    %% Cloud
+    subgraph Azure_Cloud [Azure Infrastructure]
+        HUB[Azure IoT Hub]
+        DB[(DB)]
+    end
+
+    USER[User]
+
+    %% Connections
+    PIR --> RP
+    BTN --> RP
+    ENV --> RP
+    CAM --> RP
+
+    RP --> RAW
+    RP --> SF
+    RP --> EMG
+    RP --> PP
+    RP --> SA
+
+    RP --> AI_LAYER
+    AI_LAYER --> FC
+    FC --> PPose
+    AI_LAYER --> SD
+    AI_LAYER --> PT
+    AI_LAYER --> AI_STATUS
+
+    RAW --> SF
+    SF --> AI_LAYER
+    AI_LAYER --> PP
+    AI_LAYER --> EMG
+
+    PP --> SA
+    EMG --> SA
+    SA --> SECURE
+    SECURE --> HUB
+
+    HUB --> DB
+    DB --> USER
+    USER --> HUB

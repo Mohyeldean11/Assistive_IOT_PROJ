@@ -1,0 +1,71 @@
+classDiagram
+    class PoseProcessor {
+      - poselandmarker
+      - options
+      + __init__(model_path)
+      + captureframe()
+      + _extract_pose_data(results)
+      + processframe() dict
+      + capture_sequence(count, delay) list<dict>
+    }
+
+    class frame_classifier {
+      - pose_processor : PoseProcessor
+      + __init__()
+      + get_face() dict
+      + get_body() dict
+      + get_whole_person() dict
+      + get_sequence(count) list<dict>
+      + compute_spatial_features(pose_sequence) dict
+    }
+
+    class StrokeDetector {
+      - pose_history : list[dict]
+      - WINDOW : int
+      - ASYMMETRY_THRESHOLD : float
+      - ARM_DROP_THRESHOLD : float
+      - COLLAPSE_THRESHOLD : float
+      - FREEZE_THRESHOLD : float
+      + __init__()
+      + update(landmarks)
+      + _get(landmarks, name, axis)
+      + check_facial_droop(landmarks)
+      + check_arm_weakness(landmarks)
+      + check_sudden_collapse()
+      + check_pose_freeze()
+      + check_gradual_deterioration()
+      + get_stroke_risk(landmarks) dict
+    }
+
+    class pose_training {
+      + vectorize_features(features) list<float>
+      + load_model(model_path)
+      + save_model(model, model_path)
+      + load_dataset(dataset_path)
+      + save_training_sample(pose_sequence, label, dataset_path)
+      + train_classifier(X, y)
+      + train_from_dataset(dataset_path, model_path)
+      + predict_from_features(features, model)
+    }
+
+    class AI_LAYER {
+      - model : str
+      - old_pose : str
+      - person_pose : str
+      - frame_classifier_instance : frame_classifier
+      - stroke_detector : StrokeDetector
+      - pose_model
+      + __init__(model, model_path)
+      + Prompt_builder() str
+      + _classify_pose_from_rules(features) str
+      + _predict_pose_from_model(features) str|None
+      + Get_Elder_Pose() str
+      + Get_Stroke_Risk() dict
+      + Get_Elder_status(sensor_grp_data) str
+    }
+
+    frame_classifier --> PoseProcessor
+    AI_LAYER --> frame_classifier
+    AI_LAYER --> StrokeDetector
+    AI_LAYER --> pose_training
+    pose_training --> frame_classifier : uses

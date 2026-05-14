@@ -1,0 +1,67 @@
+
+sequenceDiagram
+    participant Main
+    participant AI_LAYER
+    participant frame_classifier
+    participant PoseProcessor
+    participant StrokeDetector
+    participant pose_training
+
+    Main->>AI_LAYER: instantiate(model_path)
+    AI_LAYER->>pose_training: load_model(model_path)
+    pose_training-->>AI_LAYER: model or None
+
+    Main->>AI_LAYER: Get_Elder_Pose()
+    AI_LAYER->>frame_classifier: get_sequence(count=4)
+    frame_classifier->>PoseProcessor: capture_sequence(count)
+    loop each frame
+        PoseProcessor->>PoseProcessor: captureframe()
+        PoseProcessor->>PoseProcessor: processframe()
+    end
+    PoseProcessor-->>frame_classifier: pose_sequence
+    frame_classifier->>frame_classifier: compute_spatial_features(pose_sequence)
+    frame_classifier-->>AI_LAYER: features
+    AI_LAYER->>pose_training: predict_from_features(features, model)
+    alt model available
+        pose_training-->>AI_LAYER: predicted_pose
+    else no model
+        AI_LAYER-->>AI_LAYER: _classify_pose_from_rules(features)
+        AI_LAYER-->>AI_LAYER: rule_pose
+    end
+    AI_LAYER-->>Main: current_pose
+
+    Main->>AI_LAYER: Get_Stroke_Risk()
+    AI_LAYER->>frame_classifier: get_whole_person()
+    frame_classifier->>PoseProcessor: processframe()
+    PoseProcessor-->>frame_classifier: body_landmarks
+    frame_classifier-->>AI_LAYER: landmarks
+    AI_LAYER->>StrokeDetector: get_stroke_risk(landmarks)
+    StrokeDetector->>StrokeDetector: update(landmarks)
+    StrokeDetector->>StrokeDetector: check_facial_droop(landmarks)
+    StrokeDetector->>StrokeDetector: check_arm_weakness(landmarks)
+    StrokeDetector->>StrokeDetector: check_sudden_collapse()
+    StrokeDetector->>StrokeDetector: check_pose_freeze()
+    StrokeDetector->>StrokeDetector: check_gradual_deterioration()
+    StrokeDetector-->>AI_LAYER: stroke_risk
+    AI_LAYER-->>Main: stroke_risk
+
+    Main->>AI_LAYER: Get_Elder_status(sensor_data)
+    AI_LAYER->>AI_LAYER: Prompt_builder()
+    AI_LAYER->>ollama: generate(prompt)
+    ollama-->>AI_LAYER: status_response
+    AI_LAYER-->>Main: status
+
+    alt collecting training samples
+        Main->>pose_training: save_training_sample(pose_sequence, label)
+        pose_training->>frame_classifier: compute_spatial_features(pose_sequence)
+        frame_classifier-->>pose_training: features
+        pose_training-->>Main: saved_sample
+    end
+
+    alt training model
+        Main->>pose_training: train_from_dataset(dataset_path, model_path)
+        pose_training->>pose_training: load_dataset(dataset_path)
+        pose_training->>pose_training: train_classifier(X, y)
+        pose_training->>pose_training: save_model(model, model_path)
+        pose_training-->>Main: model_saved
+    end
