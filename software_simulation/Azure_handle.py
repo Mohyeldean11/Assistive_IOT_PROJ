@@ -3,8 +3,7 @@ from azure.iot.device import IoTHubDeviceClient, Message
 from azure.data.tables import TableServiceClient
 import time, uuid,json
 
-# CONNECTION_STRING = "YOUR IOT ID"
-# STORAGE_CONNECTION_STRING = "YOUR DB ID"
+
 TABLE_NAME = "telemetry"
 
 class AzureAdmin:
