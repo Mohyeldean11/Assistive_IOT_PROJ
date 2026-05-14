@@ -84,4 +84,4 @@ if __name__ == '__main__':
 
         # Save logs
         save_logs(parsed_payload)
-  
+        time.sleep(600)

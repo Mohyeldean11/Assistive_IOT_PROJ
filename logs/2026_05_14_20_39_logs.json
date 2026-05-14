@@ -1,0 +1,28 @@
+[
+  {
+    "deviceId": "rpi-01",
+    "dht22": {
+      "gpio_pin": 4,
+      "timestamp": "Thu May 14 22:40:01 2026",
+      "temperature_celsius": -3,
+      "humidity_percent": 55
+    },
+    "PIR501": {
+      "value": 0,
+      "gpio_pin": 3,
+      "timestamp": "Thu May 14 22:40:01 2026"
+    },
+    "pose": "STANDING",
+    "health_status": "'Not_Normal'",
+    "emergency": true,
+    "stroke_risk": {
+      "risk_level": "LOW",
+      "facial_droop": false,
+      "arm_weakness": false,
+      "sudden_collapse": false,
+      "pose_freeze": false,
+      "gradual_deterioration": false,
+      "signs_count": 0
+    }
+  }
+]
