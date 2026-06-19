@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block title %}Emergency Contact | CareAgent AI{% endblock %}
+{% block content %}
+<header class="topbar"><div><p class="eyebrow">ADMINISTRATION</p><h1>Emergency Contact</h1><p class="muted">One designated contact receives local dashboard and email alerts.</p></div></header>
+<section class="card form-card">
+  <form method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <label>Contact name<input name="name" value="{{ contact.name }}" required></label>
+    <label>Email address<input type="email" name="email" value="{{ contact.email }}" required></label>
+    <label>Phone number<input name="phone" value="{{ contact.phone or '' }}" placeholder="+20..."></label>
+    <button class="btn primary" type="submit">Save contact</button>
+  </form>
+  <div class="note"><strong>Local-only configuration</strong><p>SMTP credentials remain in the local <code>.env</code>. No cloud integration is active.</p></div>
+</section>
+{% endblock %}

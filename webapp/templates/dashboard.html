@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% block content %}
+<header class="topbar">
+  <div><p class="eyebrow">LIVE MONITORING</p><h1>Patient Safety Dashboard</h1><p class="muted">One patient · one Raspberry Pi · expected upload every 2 minutes</p></div>
+  <div class="user-pill">{{ current_user.username }} · {{ current_user.role|title }}</div>
+</header>
+{% set p = latest.payload if latest else {} %}{% set risk = p.get('stroke_risk', {}) %}{% set dht = p.get('dht22', {}) %}{% set pir = p.get('PIR501', {}) %}
+<section class="status-banner {{ risk.get('risk_level','unknown')|lower }}" id="status-banner">
+  <div><span class="pulse" id="connection-pulse"></span><strong id="health-status">{{ p.get('health_status','Waiting for first reading')|clean_status }}</strong><small id="last-seen" data-received-at="{{ latest.received_at.isoformat() if latest else '' }}">{% if latest %}Last received {{ latest.received_at.strftime('%Y-%m-%d %H:%M:%S') }} UTC{% else %}No data received yet{% endif %}</small></div>
+  <span class="risk-badge {{ risk.get('risk_level','unknown')|lower }}" id="risk-level">{{ risk.get('risk_level','UNKNOWN') }}</span>
+</section>
+
+<section class="grid metrics">
+  <article class="card metric"><span>Temperature</span><strong id="temperature">{{ dht.get('temperature_celsius','--') }}{% if dht %}°C{% endif %}</strong><small>DHT22 · GPIO {{ dht.get('gpio_pin','--') }}</small></article>
+  <article class="card metric"><span>Humidity</span><strong id="humidity">{{ dht.get('humidity_percent','--') }}{% if dht %}%{% endif %}</strong><small>Room environment</small></article>
+  <article class="card metric"><span>Motion</span><strong id="motion">{{ 'Detected' if pir.get('value') == 1 else 'Not detected' }}</strong><small>PIR501 · GPIO {{ pir.get('gpio_pin','--') }}</small></article>
+  <article class="card metric"><span>Pose State</span><strong id="pose">{{ p.get('pose','--') }}</strong><small id="pose-confidence">Confidence {{ '%.0f'|format((p.get('pose_confidence',0)|float)*100) if p.get('pose_confidence') is not none else '--' }}%</small></article>
+</section>
+
+<section class="content-grid">
+
+  <article class="card snapshot-card">
+    <div class="card-head"><div><span>Camera snapshot</span><h2>Latest visual confirmation</h2></div></div>
+    {% set snap = p.get('snapshot', {}) if p else {} %}
+    {% if snap.get('latest_image_url') or snap.get('image_url') %}
+      <img id="snapshot-image" src="{{ snap.get('latest_image_url') or snap.get('image_url') }}?v={{ latest.id if latest else 0 }}" alt="Latest Raspberry Pi camera snapshot">
+      <small id="snapshot-time">Captured {{ snap.get('captured_at', 'recently') }}</small>
+    {% else %}
+      <div class="snapshot-placeholder" id="snapshot-placeholder">No camera snapshot received yet</div>
+      <img id="snapshot-image" class="hidden" alt="Latest Raspberry Pi camera snapshot">
+      <small id="snapshot-time"></small>
+    {% endif %}
+    <p class="safety-note">Snapshot updates with each telemetry upload. Use it for visual confirmation only, not diagnosis.</p>
+  </article>
+  <article class="card risk-card">
+    <div class="card-head"><div><span>Stroke-risk indicators</span><h2>Temporal FAST &amp; movement analysis</h2></div><strong id="signs-count">{{ risk.get('signs_count',0) }} signs</strong></div>
+    <div class="signs" id="signs-grid">
+      {% for key,label in [('facial_droop','Facial asymmetry'),('arm_weakness','Arm asymmetry'),('sudden_collapse','Sudden collapse'),('pose_freeze','Prolonged immobility'),('gradual_deterioration','Postural deterioration')] %}
+      <div class="sign {{ 'positive' if risk.get(key) else '' }}" data-sign="{{ key }}"><span>{{ label }}</span><strong>{{ 'DETECTED' if risk.get(key) else 'Clear' }}</strong></div>
+      {% endfor %}
+    </div>
+    <p class="safety-note">Camera-only indicators cannot diagnose stroke. Speech, vision, balance, clinical history, and direct assessment are not fully captured by this system.</p>
+  </article>
+
+  <article class="card emergency-card">
+    <span>Emergency action</span><h2>Immediate Assistance</h2><p>Use the phone action for immediate contact. The SOS action sends an urgent email and records an alert.</p>
+    {% if contact and contact.phone %}<a class="call-button" href="tel:{{ contact.phone }}">Call {{ contact.name }}</a>{% else %}<button class="call-button disabled" disabled>No phone configured</button>{% endif %}
+    <form method="post" action="{{ url_for('emergency') }}" onsubmit="return confirm('Send an emergency email alert now?')">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="sos" type="submit">SOS<small>SEND EMAIL ALERT</small></button>
+    </form>
+    {% if contact %}<div class="contact"><small>Emergency contact</small><strong>{{ contact.name }}</strong><span>{{ contact.phone or contact.email }}</span></div>{% endif %}
+  </article>
+</section>
+
+<section class="card history">
+  <div class="card-head"><div><span>Recent telemetry</span><h2>Monitoring history</h2></div></div>
+  <div class="table-wrap"><table><thead><tr><th>Received</th><th>Device</th><th>Status</th><th>Pose</th><th>Risk</th><th>Temperature</th><th>Humidity</th><th>Emergency</th></tr></thead><tbody id="history-body">
+  {% for item in recent %}{% set row=item.payload %}<tr><td data-label="Received">{{ item.received_at.strftime('%H:%M:%S · %d %b') }}</td><td data-label="Device">{{ item.device_id }}</td><td data-label="Status">{{ row.get('health_status','--')|clean_status }}</td><td data-label="Pose">{{ row.get('pose','--') }}</td><td data-label="Risk"><span class="mini-badge {{ item.risk_level|lower }}">{{ item.risk_level }}</span></td><td data-label="Temperature">{{ row.get('dht22',{}).get('temperature_celsius','--') }}°C</td><td data-label="Humidity">{{ row.get('dht22',{}).get('humidity_percent','--') }}%</td><td data-label="Emergency">{{ 'Yes' if item.emergency else 'No' }}</td></tr>{% else %}<tr><td colspan="8" class="empty">No readings yet. Start the Raspberry Pi agent.</td></tr>{% endfor %}
+  </tbody></table></div>
+</section>
+
+<section class="card alert-history">
+  <div class="card-head"><div><span>Alert audit</span><h2>Latest alert attempts</h2></div></div>
+  <div class="alert-list">{% for alert in alerts %}<div class="alert-row"><span class="mini-badge {{ alert.severity|lower }}">{{ alert.severity }}</span><div><strong>{{ alert.source }}</strong><small>{{ alert.created_at.strftime('%Y-%m-%d %H:%M:%S') }} UTC · {{ 'Email sent' if alert.email_sent else alert.message }}</small></div></div>{% else %}<p class="empty">No alerts recorded.</p>{% endfor %}</div>
+</section>
+{% endblock %}
+{% block scripts %}<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>{% endblock %}

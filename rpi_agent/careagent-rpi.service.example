@@ -1,0 +1,16 @@
+[Unit]
+Description=CareAgent AI Raspberry Pi monitoring agent
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=pi
+WorkingDirectory=/home/pi/careagent_ai_enhanced/rpi_agent
+Environment=PYTHONUNBUFFERED=1
+ExecStart=/home/pi/careagent_ai_enhanced/rpi_agent/.venv/bin/python main.py
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

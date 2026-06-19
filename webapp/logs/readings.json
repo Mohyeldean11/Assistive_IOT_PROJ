@@ -1,0 +1,122 @@
+[
+  {
+    "PIR501": {
+      "gpio_pin": 3,
+      "timestamp": "2026-06-16T20:00:00+00:00",
+      "value": 1
+    },
+    "captured_at": "2026-06-16T20:00:00+00:00",
+    "deviceId": "rpi-01",
+    "dht22": {
+      "gpio_pin": 4,
+      "humidity_percent": 50,
+      "temperature_celsius": 23,
+      "timestamp": "2026-06-16T20:00:00+00:00"
+    },
+    "emergency": false,
+    "event_id": "test-event-1",
+    "health_status": "Normal",
+    "pose": "STANDING",
+    "pose_confidence": 0.8,
+    "stroke_risk": {
+      "arm_weakness": false,
+      "facial_droop": false,
+      "gradual_deterioration": false,
+      "pose_freeze": false,
+      "risk_level": "LOW",
+      "signs_count": 0,
+      "sudden_collapse": false
+    }
+  },
+  {
+    "PIR501": {
+      "gpio_pin": 3,
+      "timestamp": "2026-06-16T20:00:00+00:00",
+      "value": 1
+    },
+    "captured_at": "2026-06-16T20:00:00+00:00",
+    "deviceId": "rpi-01",
+    "dht22": {
+      "gpio_pin": 4,
+      "humidity_percent": 50,
+      "temperature_celsius": 23,
+      "timestamp": "2026-06-16T20:00:00+00:00"
+    },
+    "emergency": false,
+    "event_id": "test-event-1",
+    "health_status": "Normal",
+    "pose": "STANDING",
+    "pose_confidence": 0.8,
+    "stroke_risk": {
+      "arm_weakness": false,
+      "facial_droop": false,
+      "gradual_deterioration": false,
+      "pose_freeze": false,
+      "risk_level": "LOW",
+      "signs_count": 0,
+      "sudden_collapse": false
+    }
+  },
+  {
+    "PIR501": {
+      "gpio_pin": 3,
+      "timestamp": "now",
+      "value": 1
+    },
+    "captured_at": "2026-06-16T21:00:00Z",
+    "deviceId": "rpi-01",
+    "dht22": {
+      "gpio_pin": 4,
+      "humidity_percent": 55,
+      "temperature_celsius": 22,
+      "timestamp": "now"
+    },
+    "emergency": false,
+    "event_id": "snapshot-test-1",
+    "health_status": "Normal",
+    "pose": "STANDING",
+    "snapshot": {
+      "captured_at": "now",
+      "encoding": "base64",
+      "mime_type": "image/jpeg",
+      "filename": "rpi-01_snapshot-test-1.jpg",
+      "latest_filename": "latest_rpi-01.jpg",
+      "image_url": "/static/snapshots/rpi-01_snapshot-test-1.jpg",
+      "latest_image_url": "/static/snapshots/latest_rpi-01.jpg",
+      "stored_at": "2026-06-16T22:00:40.855305+00:00"
+    },
+    "stroke_risk": {
+      "risk_level": "LOW",
+      "signs_count": 0
+    }
+  },
+  {
+    "PIR501": {
+      "gpio_pin": 3,
+      "timestamp": "2026-06-16T20:00:00+00:00",
+      "value": 1
+    },
+    "captured_at": "2026-06-16T20:00:00+00:00",
+    "deviceId": "rpi-01",
+    "dht22": {
+      "gpio_pin": 4,
+      "humidity_percent": 50,
+      "temperature_celsius": 23,
+      "timestamp": "2026-06-16T20:00:00+00:00"
+    },
+    "emergency": false,
+    "event_id": "test-event-1",
+    "health_status": "Normal",
+    "pose": "STANDING",
+    "pose_confidence": 0.8,
+    "stroke_risk": {
+      "arm_weakness": false,
+      "facial_droop": false,
+      "gradual_deterioration": false,
+      "pose_freeze": false,
+      "risk_level": "LOW",
+      "signs_count": 0,
+      "sudden_collapse": false
+    }
+  }
+]

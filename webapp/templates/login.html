@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block title %}Login | CareAgent AI{% endblock %}
+{% block content %}
+<section class="login-card">
+  <div class="login-brand"><div class="brand-mark large">CA</div><h1>CareAgent AI</h1><p>Secure local elderly safety monitoring</p></div>
+  <form method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <label>Username<input name="username" autocomplete="username" required></label>
+    <label>Password<input type="password" name="password" autocomplete="current-password" required></label>
+    <label class="check"><input type="checkbox" name="remember"> Keep me signed in</label>
+    <button class="btn primary full" type="submit">Sign in</button>
+  </form>
+  <div class="credit">Designed and architected by <strong>Mohie Eldean Badawy</strong></div>
+</section>
+{% endblock %}

@@ -1,0 +1,18 @@
+# Install this file from a Python 3.11 virtual environment on the Raspberry Pi 5.
+# Keep the MediaPipe package/version that is already proven to work on your Pi OS ARM64 image.
+# Official PyPI releases may not provide a Linux ARM64 wheel, so mediapipe is intentionally not pinned here.
+numpy>=1.26,<3
+opencv-python-headless>=4.10,<5
+requests>=2.32,<3
+python-dotenv>=1.0,<2
+joblib>=1.4,<2
+pandas>=2.2,<3
+scikit-learn>=1.5,<2
+
+# Hardware-only packages (uncomment/install when SIMULATE_SENSORS=false):
+# adafruit-circuitpython-dht>=4.0
+# gpiozero>=2.0
+# lgpio>=0.2
+
+# Optional local LLM summary (disabled by default):
+# ollama>=0.5
