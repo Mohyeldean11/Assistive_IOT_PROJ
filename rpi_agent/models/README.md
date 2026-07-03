@@ -4,6 +4,9 @@ Place the MediaPipe Pose Landmarker task model used by your working Raspberry Pi
 pose_landmarker_lite.task
 ```
 
+
+This snapshot now includes `pose_classifier.joblib` trained on the synthetic bootstrap `pose_dataset.csv`. Treat it as a starter model for local testing, not as clinical validation. Retrain it with real camera data from your Raspberry Pi sessions before relying on the model output.
+
 After collecting and training project-specific pose data, `pose_training.py` writes:
 
 ```text

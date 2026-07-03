@@ -146,7 +146,16 @@ The original code opened and closed the camera for every frame and used independ
 
 ## 6. Train the pose classifier
 
-Collect data in several independent sessions rather than collecting one long sequence and randomly splitting adjacent frames.
+This package includes a deterministic synthetic bootstrap dataset at `rpi_agent/pose_dataset.csv` and a matching starter model at `rpi_agent/models/pose_classifier.joblib`. These samples are for pipeline testing only; replace or augment them with real Raspberry Pi captures before presenting the model as reliable.
+
+Regenerate the bootstrap dataset and starter model:
+
+```bash
+cd rpi_agent
+python pose_training.py --generate-synthetic --synthetic-per-label 160 --synthetic-sessions 4 --train
+```
+
+Collect real data in several independent sessions rather than collecting one long sequence and randomly splitting adjacent frames.
 
 ```bash
 python pose_training.py --collect STANDING --samples 200

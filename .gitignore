@@ -1,0 +1,11 @@
+**/.venv/
+**/__pycache__/
+**/*.pyc
+**/.env
+**/instance/*.db
+**/logs/*
+!**/logs/.gitkeep
+**/spool/*.json
+**/pose_dataset.csv
+**/models/*.joblib
+**/models/*.report.json

@@ -6,7 +6,7 @@ import statistics
 from dataclasses import dataclass
 from typing import Any
 
-from pose_features import distance, midpoint, visible
+from pose_features import clamp, distance, midpoint, safe_ratio, visible
 
 
 @dataclass
@@ -38,66 +38,115 @@ class StrokeRiskEngine:
         landmarks = observation.get("landmarks", observation)
         return landmarks if isinstance(landmarks, dict) else {}
 
+    @staticmethod
+    def _value(point: dict[str, Any], key: str, default: float = 0.0) -> float:
+        try:
+            value = float(point.get(key, default))
+        except (TypeError, ValueError, AttributeError):
+            return default
+        return value if math.isfinite(value) else default
+
     def _prune(self, newest_timestamp_ms: int) -> None:
         cutoff = newest_timestamp_ms - int(self.history_seconds * 1000)
         while self.history and int(self.history[0].get("timestamp_ms", 0)) < cutoff:
             self.history.popleft()
 
+    def _body_scale(self, lm: dict[str, dict[str, Any]]) -> float:
+        names = ["LEFT_SHOULDER", "RIGHT_SHOULDER", "LEFT_HIP", "RIGHT_HIP"]
+        if any(not visible(lm.get(name), self.visibility_threshold) for name in names):
+            return 0.0
+        shoulders = midpoint(lm["LEFT_SHOULDER"], lm["RIGHT_SHOULDER"])
+        hips = midpoint(lm["LEFT_HIP"], lm["RIGHT_HIP"])
+        torso = distance(shoulders, hips, include_z=False)
+        shoulder_width = distance(lm["LEFT_SHOULDER"], lm["RIGHT_SHOULDER"], include_z=False)
+        hip_width = distance(lm["LEFT_HIP"], lm["RIGHT_HIP"], include_z=False)
+        values = [value for value in (torso, shoulder_width * 1.35, hip_width * 1.60) if value > 1e-5]
+        return max(statistics.median(values), 1e-4) if values else 0.0
+
     def _frontal_face(self, lm: dict[str, dict[str, Any]]) -> bool:
         needed = ["LEFT_EYE", "RIGHT_EYE", "LEFT_EAR", "RIGHT_EAR", "LEFT_SHOULDER", "RIGHT_SHOULDER"]
         if any(not visible(lm.get(name), self.visibility_threshold) for name in needed):
             return False
-        shoulder_depth_diff = abs(float(lm["LEFT_SHOULDER"].get("z", 0)) - float(lm["RIGHT_SHOULDER"].get("z", 0)))
+        shoulder_depth_diff = abs(self._value(lm["LEFT_SHOULDER"], "z") - self._value(lm["RIGHT_SHOULDER"], "z"))
         eye_width = distance(lm["LEFT_EYE"], lm["RIGHT_EYE"], include_z=False)
         ear_width = distance(lm["LEFT_EAR"], lm["RIGHT_EAR"], include_z=False)
-        return eye_width > 0.018 and ear_width > eye_width * 1.15 and shoulder_depth_diff < 0.22
+        eye_slope = safe_ratio(abs(self._value(lm["RIGHT_EYE"], "y") - self._value(lm["LEFT_EYE"], "y")), eye_width)
+        return eye_width > 0.018 and ear_width > eye_width * 1.10 and shoulder_depth_diff < 0.24 and eye_slope < 0.45
 
     def _face_asymmetry_score(self, lm: dict[str, dict[str, Any]]) -> float:
         names = ["MOUTH_LEFT", "MOUTH_RIGHT", "LEFT_EYE", "RIGHT_EYE"]
         if any(not visible(lm.get(name), self.visibility_threshold) for name in names) or not self._frontal_face(lm):
             return 0.0
-        mouth_diff = abs(float(lm["MOUTH_LEFT"]["y"]) - float(lm["MOUTH_RIGHT"]["y"]))
-        eye_diff = abs(float(lm["LEFT_EYE"]["y"]) - float(lm["RIGHT_EYE"]["y"]))
         face_scale = max(distance(lm["LEFT_EYE"], lm["RIGHT_EYE"], include_z=False), 0.015)
-        # Pose Landmarker has sparse face landmarks, so require a strong normalized signal.
-        normalized = (mouth_diff + 0.5 * eye_diff) / face_scale
-        return min(1.0, normalized / 0.34)
+        mouth_tilt = self._value(lm["MOUTH_RIGHT"], "y") - self._value(lm["MOUTH_LEFT"], "y")
+        eye_tilt = self._value(lm["RIGHT_EYE"], "y") - self._value(lm["LEFT_EYE"], "y")
+        # Compensate for head tilt: under normal tilt, the mouth and eye line move
+        # in the same direction. A residual mouth-only tilt is more suspicious.
+        tilt_residual = abs(mouth_tilt - eye_tilt)
+        normalized = tilt_residual / face_scale
+        return clamp((normalized - 0.08) / 0.28)
 
     def _arm_asymmetry_score(self, lm: dict[str, dict[str, Any]]) -> float:
         names = ["LEFT_SHOULDER", "RIGHT_SHOULDER", "LEFT_ELBOW", "RIGHT_ELBOW", "LEFT_WRIST", "RIGHT_WRIST"]
         if any(not visible(lm.get(name), self.visibility_threshold) for name in names):
             return 0.0
-        shoulder_width = max(distance(lm["LEFT_SHOULDER"], lm["RIGHT_SHOULDER"], include_z=False), 0.03)
-        wrist_diff = abs(float(lm["LEFT_WRIST"]["y"]) - float(lm["RIGHT_WRIST"]["y"])) / shoulder_width
-        elbow_diff = abs(float(lm["LEFT_ELBOW"]["y"]) - float(lm["RIGHT_ELBOW"]["y"])) / shoulder_width
-        # Passive monitoring cannot confirm clinical arm drift. This is only an asymmetry cue.
-        normalized = 0.7 * wrist_diff + 0.3 * elbow_diff
-        return min(1.0, max(0.0, (normalized - 0.22) / 0.45))
+        scale = max(self._body_scale(lm), distance(lm["LEFT_SHOULDER"], lm["RIGHT_SHOULDER"], include_z=False), 0.03)
+        left_wrist_drop = self._value(lm["LEFT_WRIST"], "y") - self._value(lm["LEFT_SHOULDER"], "y")
+        right_wrist_drop = self._value(lm["RIGHT_WRIST"], "y") - self._value(lm["RIGHT_SHOULDER"], "y")
+        left_elbow_drop = self._value(lm["LEFT_ELBOW"], "y") - self._value(lm["LEFT_SHOULDER"], "y")
+        right_elbow_drop = self._value(lm["RIGHT_ELBOW"], "y") - self._value(lm["RIGHT_SHOULDER"], "y")
+        wrist_residual = abs(left_wrist_drop - right_wrist_drop) / scale
+        elbow_residual = abs(left_elbow_drop - right_elbow_drop) / scale
+        normalized = 0.68 * wrist_residual + 0.32 * elbow_residual
+        shoulder_depth_diff = abs(self._value(lm["LEFT_SHOULDER"], "z") - self._value(lm["RIGHT_SHOULDER"], "z"))
+        perspective_weight = clamp(1.0 - shoulder_depth_diff / 0.35, 0.35, 1.0)
+        return clamp((normalized - 0.24) / 0.52) * perspective_weight
 
-    def _center(self, lm: dict[str, dict[str, Any]]) -> tuple[float, float] | None:
+    def _center(self, lm: dict[str, dict[str, Any]]) -> tuple[float, float, float] | None:
         names = ["LEFT_SHOULDER", "RIGHT_SHOULDER", "LEFT_HIP", "RIGHT_HIP"]
         if any(not visible(lm.get(name), self.visibility_threshold) for name in names):
             return None
         shoulders = midpoint(lm["LEFT_SHOULDER"], lm["RIGHT_SHOULDER"])
         hips = midpoint(lm["LEFT_HIP"], lm["RIGHT_HIP"])
         center = midpoint(shoulders, hips)
-        return float(center["x"]), float(center["y"])
+        scale = self._body_scale(lm)
+        if scale <= 0:
+            return None
+        return float(center["x"]), float(center["y"]), scale
+
+    @staticmethod
+    def _percentile(values: list[float], percentile: float) -> float:
+        if not values:
+            return 0.0
+        ordered = sorted(values)
+        if len(ordered) == 1:
+            return ordered[0]
+        rank = clamp(percentile / 100.0) * (len(ordered) - 1)
+        low = int(math.floor(rank))
+        high = int(math.ceil(rank))
+        if low == high:
+            return ordered[low]
+        fraction = rank - low
+        return ordered[low] * (1.0 - fraction) + ordered[high] * fraction
 
     def _motion_metrics(self) -> tuple[float, float, float]:
-        samples: list[tuple[int, float, float]] = []
+        samples: list[tuple[int, float, float, float]] = []
         for observation in self.history:
             center = self._center(self._landmarks(observation))
             if center:
-                samples.append((int(observation.get("timestamp_ms", 0)), center[0], center[1]))
+                samples.append((int(observation.get("timestamp_ms", 0)), center[0], center[1], center[2]))
         if len(samples) < 3:
             return 0.0, 0.0, 0.0
         movements, downward_speeds = [], []
         for previous, current in zip(samples, samples[1:]):
             dt = max((current[0] - previous[0]) / 1000.0, 1e-3)
-            movements.append(math.hypot(current[1] - previous[1], current[2] - previous[2]) / dt)
-            downward_speeds.append((current[2] - previous[2]) / dt)
-        total_drop = samples[-1][2] - samples[0][2]
-        return statistics.median(movements), max(downward_speeds), total_drop
+            scale = max(statistics.median([previous[3], current[3]]), 1e-4)
+            movements.append(math.hypot(current[1] - previous[1], current[2] - previous[2]) / scale / dt)
+            downward_speeds.append((current[2] - previous[2]) / scale / dt)
+        median_scale = max(statistics.median([sample[3] for sample in samples]), 1e-4)
+        total_drop = (samples[-1][2] - samples[0][2]) / median_scale
+        positive_downward = [speed for speed in downward_speeds if speed > 0]
+        return statistics.median(movements), self._percentile(positive_downward, 90), total_drop
 
     @staticmethod
     def _persistent(states: collections.deque[SignalState], attr: str, required: int) -> bool:
@@ -116,7 +165,7 @@ class StrokeRiskEngine:
 
         collapse_signal = (
             (pose_label in {"FALLING", "COLLAPSING"} and pose_confidence >= 0.72)
-            or (max_downward_speed > 0.32 and total_drop > 0.12)
+            or (max_downward_speed > 1.25 and total_drop > 0.55)
         )
         if collapse_signal:
             self.last_collapse_timestamp_ms = timestamp_ms
@@ -124,16 +173,19 @@ class StrokeRiskEngine:
             self.last_collapse_timestamp_ms
             and timestamp_ms - self.last_collapse_timestamp_ms >= 2500
             and timestamp_ms - self.last_collapse_timestamp_ms <= 15000
-            and movement_speed < 0.012
+            and movement_speed < 0.05
             and pose_label in {"LYING", "UNKNOWN"}
         )
 
-        recent_centers = []
+        recent_centers: list[tuple[float, float]] = []
         for obs in list(self.history)[-10:]:
             center = self._center(self._landmarks(obs))
             if center:
-                recent_centers.append(center[1])
-        deterioration = len(recent_centers) >= 6 and recent_centers[-1] - recent_centers[0] > 0.08 and pose_label not in {"FALLING", "COLLAPSING"}
+                recent_centers.append((center[1], center[2]))
+        deterioration = False
+        if len(recent_centers) >= 6:
+            median_scale = max(statistics.median([center[1] for center in recent_centers]), 1e-4)
+            deterioration = (recent_centers[-1][0] - recent_centers[0][0]) / median_scale > 0.35 and pose_label not in {"FALLING", "COLLAPSING"}
 
         raw = SignalState(
             facial_droop=face_score >= 0.78,
@@ -182,9 +234,9 @@ class StrokeRiskEngine:
             "evidence": {
                 "face_asymmetry_score": round(face_score, 3),
                 "arm_asymmetry_score": round(arm_score, 3),
-                "movement_speed": round(movement_speed, 4),
-                "max_downward_speed": round(max_downward_speed, 4),
-                "total_drop": round(total_drop, 4),
+                "movement_speed_body_lengths_s": round(movement_speed, 4),
+                "max_downward_speed_body_lengths_s": round(max_downward_speed, 4),
+                "total_drop_body_lengths": round(total_drop, 4),
             },
             "limitations": "Camera-based warning only; not a stroke diagnosis and does not assess speech, vision, or clinical history.",
         }

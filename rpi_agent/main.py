@@ -175,13 +175,24 @@ def main() -> None:
     parser.add_argument("--collect", metavar="LABEL", help="Collect pose samples; delegates to pose_training.py")
     parser.add_argument("--samples", type=int, default=100)
     parser.add_argument("--train", action="store_true", help="Train the pose classifier from pose_dataset.csv")
+    parser.add_argument("--generate-synthetic", action="store_true", help="Create a bootstrap synthetic pose_dataset.csv")
+    parser.add_argument("--synthetic-per-label", type=int, default=160)
+    parser.add_argument("--synthetic-sessions", type=int, default=4)
+    parser.add_argument("--seed", type=int, default=42)
     args = parser.parse_args()
 
-    if args.collect or args.train:
+    if args.collect or args.generate_synthetic or args.train:
         import pose_training
         if args.collect:
             pose_training.collect_samples(args.collect, args.samples)
-        else:
+        if args.generate_synthetic:
+            frame = pose_training.generate_synthetic_samples(
+                samples_per_label=args.synthetic_per_label,
+                sessions_per_label=args.synthetic_sessions,
+                seed=args.seed,
+            )
+            print(f"Saved synthetic bootstrap dataset: {pose_training.DEFAULT_DATASET} ({len(frame)} rows)")
+        if args.train:
             pose_training.train_from_dataset()
         return
     run_agent(run_once=args.once)

@@ -8,7 +8,7 @@ from typing import Any
 import joblib
 import numpy as np
 
-from pose_features import FEATURE_COLUMNS, LEGACY_FEATURE_COLUMNS, vectorize, vectorize_legacy
+from pose_features import FEATURE_COLUMNS, FEATURE_VERSION, LEGACY_FEATURE_COLUMNS, clamp, smoothstep, vectorize, vectorize_legacy
 
 LOGGER = logging.getLogger("careagent.pose")
 ALLOWED_LABELS = {"UNKNOWN", "STANDING", "SITTING", "LYING", "FALLING", "COLLAPSING"}
@@ -109,11 +109,16 @@ class PoseClassifier:
 
             if isinstance(loaded, dict) and "model" in loaded:
                 feature_names = loaded.get("feature_names", FEATURE_COLUMNS)
-                if feature_names == FEATURE_COLUMNS:
+                feature_version = str(loaded.get("feature_version", FEATURE_VERSION))
+                if feature_names == FEATURE_COLUMNS and feature_version == FEATURE_VERSION:
                     self.bundle = loaded
                     LOGGER.info("Loaded current pose model: %s", path)
                     return
-                LOGGER.warning("Pose model at %s has an unsupported feature schema", path)
+                LOGGER.warning(
+                    "Pose model at %s has an unsupported schema/version: feature_version=%s",
+                    path,
+                    feature_version,
+                )
                 continue
 
             if hasattr(loaded, "predict"):
@@ -170,28 +175,65 @@ class PoseClassifier:
 
         return "UNKNOWN", 0.0
 
+    def _floor_contact_score(self, f: dict[str, float]) -> float:
+        if self.floor_y_normalized <= 0:
+            return 0.0
+        ankle_y = float(f.get("ankle_y", 0.0) or 0.0)
+        # y increases downward in MediaPipe normalized image coordinates. When a
+        # calibrated floor line is available, ankles close to that line strengthen
+        # lying/collapse decisions but never create an emergency by themselves.
+        return smoothstep(self.floor_y_normalized - 0.18, self.floor_y_normalized - 0.03, ankle_y)
+
     def _rules(self, f: dict[str, float]) -> tuple[str, float, bool]:
         if not f or f.get("pose_quality", 0.0) < 0.18 or f.get("visible_fraction", 0.0) < 0.40:
             return "UNKNOWN", 0.0, False
-        horizontal = f["bbox_aspect_ratio"] > 1.05 or f["horizontal_score"] > 0.62 or f["torso_tilt_deg"] > 58
-        rapid_drop = f["recent_drop_norm"] > 0.38 or f["vertical_velocity_norm_s"] > 0.75
-        moving = f["movement_norm"] > 0.07
-        if rapid_drop and moving:
-            return "FALLING", min(0.96, 0.68 + 0.18 * min(1.0, f["recent_drop_norm"])), True
-        if horizontal and rapid_drop:
-            return "COLLAPSING", 0.78, True
-        if horizontal:
-            confidence = min(0.92, 0.62 + 0.2 * min(1.0, f["horizontal_score"]))
+
+        horizontal_strength = max(
+            float(f.get("horizontal_score", 0.0) or 0.0),
+            smoothstep(0.95, 1.75, float(f.get("bbox_aspect_ratio", 0.0) or 0.0)),
+            smoothstep(45.0, 78.0, float(f.get("torso_tilt_deg", 0.0) or 0.0)),
+        )
+        rapid_drop_score = max(
+            smoothstep(0.25, 0.80, float(f.get("recent_drop_norm", 0.0) or 0.0)),
+            smoothstep(0.55, 1.75, float(f.get("vertical_velocity_norm_s", 0.0) or 0.0)),
+        )
+        movement_score = smoothstep(0.035, 0.14, float(f.get("movement_norm", 0.0) or 0.0))
+        floor_score = self._floor_contact_score(f)
+
+        if rapid_drop_score >= 0.48 and movement_score >= 0.35:
+            confidence = clamp(0.68 + 0.16 * rapid_drop_score + 0.10 * movement_score, 0.0, 0.97)
+            return "FALLING", confidence, True
+        if horizontal_strength >= 0.60 and rapid_drop_score >= 0.32:
+            confidence = clamp(0.70 + 0.15 * horizontal_strength + 0.10 * rapid_drop_score + 0.05 * floor_score, 0.0, 0.96)
+            return "COLLAPSING", confidence, True
+        if horizontal_strength >= 0.60:
+            confidence = clamp(0.61 + 0.23 * horizontal_strength + 0.04 * floor_score, 0.0, 0.94)
             return "LYING", confidence, False
-        mean_knee = (f["left_knee_angle"] + f["right_knee_angle"]) / 2.0
-        mean_hip = (f["left_hip_angle"] + f["right_hip_angle"]) / 2.0
-        if mean_knee < 135 or mean_hip < 125 or f["vertical_span_norm"] < 2.25:
-            return "SITTING", 0.70, False
-        if f["vertical_span_norm"] >= 2.0 and f["torso_tilt_deg"] < 40:
-            return "STANDING", 0.75, False
+
+        left_knee = float(f.get("left_knee_angle", 0.0) or 0.0)
+        right_knee = float(f.get("right_knee_angle", 0.0) or 0.0)
+        left_hip = float(f.get("left_hip_angle", 0.0) or 0.0)
+        right_hip = float(f.get("right_hip_angle", 0.0) or 0.0)
+        known_knees = [angle for angle in (left_knee, right_knee) if angle > 1.0]
+        known_hips = [angle for angle in (left_hip, right_hip) if angle > 1.0]
+        mean_knee = sum(known_knees) / len(known_knees) if known_knees else 180.0
+        mean_hip = sum(known_hips) / len(known_hips) if known_hips else 180.0
+        compact_upright = float(f.get("vertical_span_norm", 0.0) or 0.0) < 2.15
+        flexed_legs = mean_knee < 138 or mean_hip < 130
+        if flexed_legs or compact_upright:
+            confidence = 0.67 + (0.06 if flexed_legs else 0.0) + (0.04 if compact_upright else 0.0)
+            return "SITTING", min(0.84, confidence), False
+
+        upright_score = min(
+            smoothstep(1.85, 2.85, float(f.get("vertical_span_norm", 0.0) or 0.0)),
+            1.0 - smoothstep(28.0, 55.0, float(f.get("torso_tilt_deg", 0.0) or 0.0)),
+            1.0 - smoothstep(0.78, 1.22, float(f.get("bbox_aspect_ratio", 0.0) or 0.0)),
+        )
+        if upright_score >= 0.42:
+            return "STANDING", clamp(0.66 + 0.14 * upright_score, 0.0, 0.86), False
         # Preserve the original project's practical fallback: an upright,
         # non-horizontal detected person is most likely standing rather than None.
-        if f["torso_tilt_deg"] < 48 and f["bbox_aspect_ratio"] < 0.95:
+        if float(f.get("torso_tilt_deg", 0.0) or 0.0) < 48 and float(f.get("bbox_aspect_ratio", 0.0) or 0.0) < 0.95:
             return "STANDING", 0.62, False
         return "UNKNOWN", 0.0, False
 
